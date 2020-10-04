@@ -4,7 +4,7 @@
 			<div
 				v-for="dice in dices"
 				:key="dice.id"
-				:class="{ selected: dice.isSelected }"
+				:class="{ selected: dice.isSelected || dice.isGone }"
 				class="selection-item"
 			></div>
 		</transition-group>
@@ -15,7 +15,7 @@
 				class="dice"
 				:data-nr="dice.nr"
 				@click="click(dice.id)"
-				:class="{ selected: dice.isSelected, disabled: dice.isDisabled || dice.isGone }"
+				:class="{ selected: dice.isSelected, disabled: dice.isDisabled, gone: dice.isGone }"
 			>
 				<ul class="dots">
 					<li v-for="(dot, index) in 9" :key="index" class="dot active"></li>
@@ -222,19 +222,25 @@ $padding: 0;
 	transition: transform 0.5s;
 
 	&.selected {
-		// background-color: red;
 		.inactive {
-			// background: color.$pale;
 			transform: scale(0);
 		}
 	}
 	&.disabled {
 		cursor: default;
-		// opacity: 0.5;
 		.dot.inactive {
 			background: color.$pale;
 		}
 		.dot.active {
+			background: color.$main;
+		}
+	}
+	&.gone {
+		cursor: default;
+		.inactive {
+			transform: scale(0);
+		}
+		.active {
 			background: color.$main;
 		}
 	}

@@ -4,22 +4,22 @@ import { random } from '@/js/utilities'
 export default createStore({
 	state: {
 		dices: [],
-		nDices: 9,
+		nDices: 5,
 		boardDisabled: false,
 	},
 	mutations: {
 		roll(state) {
 			state.dices = state.dices.map(dice => ({
 				id: dice.id,
-				nr: rollDice(),
+				nr: dice.isSelected || dice.isGone ? dice.nr : rollDice(),
 				isSelected: false,
-				isGone: dice.isSelected,
+				isGone: dice.isSelected || dice.isGone,
 				isDisabled: false,
 			}))
 		},
 	},
 	actions: {
-		roll({ state, commit, dispatch }) {
+		roll({ state, commit }) {
 			if (state.dices.length === 0) {
 				const max = state.nDices
 				for (let i = 0; i < max; i++) {
@@ -32,16 +32,13 @@ export default createStore({
 					})
 				}
 			} else commit('roll')
-
-			dispatch('disable')
 		},
 		select({ state, getters, dispatch }, id) {
 			const { selected } = getters,
 				dice = state.dices[id],
 				chain = unfinished(selected)
 
-			console.log('chain', chain)
-			console.log('dice', dice.id)
+			if (dice.isDisabled || dice.isGone) return
 
 			// No dice is selected:
 			if (selected.length === 0) dice.isSelected = true

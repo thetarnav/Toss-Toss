@@ -16,7 +16,7 @@
 	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
 		<defs>
 			<filter id="goo-l">
-				<feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="blur" />
+				<feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
 				<feColorMatrix
 					in="blur"
 					mode="matrix"
