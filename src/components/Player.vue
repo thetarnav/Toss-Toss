@@ -18,9 +18,7 @@
 					viewBox="0 0 24 24"
 					xml:space="preserve"
 				>
-					<polygon
-						points="24,5.3 22.5,19.1 1.3,19.1 0,5.3 6.7,7.5 11.9,0.9 17.2,7.5 "
-					/>
+					<polygon points="24,5.3 22.5,19.1 1.3,19.1 0,5.3 6.7,7.5 11.9,0.9 17.2,7.5 " />
 				</svg>
 			</span>
 		</header>
@@ -36,14 +34,7 @@
 <script>
 export default {
 	name: 'Player',
-	props: [
-		'playerName',
-		'align',
-		'totalScore',
-		'roundScore',
-		'isWinning',
-		'isActive',
-	],
+	props: ['playerName', 'align', 'totalScore', 'roundScore', 'isWinning', 'isActive'],
 	data() {
 		return {}
 	},
@@ -65,7 +56,7 @@ export default {
 	display: block;
 	position: relative;
 
-	filter: url(#small-text-goo);
+	filter: url(#goo-s);
 	font-size: ms(1);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
@@ -103,14 +94,14 @@ export default {
 	align-items: center;
 }
 .total {
-	filter: url(#text-goo);
+	filter: url(#goo-m);
 	font-size: ms(2);
 	font-weight: 800;
 	color: color.$main;
 	letter-spacing: -0.02em;
 }
 .round {
-	filter: url(#small-text-goo);
+	filter: url(#goo-s);
 	font-size: ms(1);
 	margin-left: gs(0.5);
 	letter-spacing: -0.04em;

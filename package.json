@@ -1,7 +1,9 @@
 {
-	"name": "kdc-dice-game",
+	"name": "kcd-dice-game",
 	"version": "0.1.0",
-	"private": true,
+	"private": false,
+	"author": "Damian Tarnawski @thetarnav <gthetarnav@gmail.com>",
+	"repository": "https://github.com/thetarnav/kcd-dice-game",
 	"scripts": {
 		"deploy": "firebase deploy",
 		"serve": "vue-cli-service serve",

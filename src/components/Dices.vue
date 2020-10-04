@@ -1,21 +1,31 @@
 <template>
-	<transition-group appear name="dices" tag="div" class="dices">
-		<div
-			v-for="dice in dices"
-			:key="dice.id"
-			class="dice"
-			:data-nr="dice.nr"
-			@click="click(dice.id)"
-			:class="{ selected: dice.isSelected, disabled: dice.isDisabled || dice.isGone }"
-		>
-			<ul class="dots">
-				<li v-for="(dot, index) in 9" :key="index" class="dot active"></li>
-			</ul>
-			<ul class="dots">
-				<li v-for="(dot, index) in 9" :key="index" class="dot inactive"></li>
-			</ul>
-		</div>
-	</transition-group>
+	<div class="wrapper">
+		<transition-group name="selection" tag="div" class="selection">
+			<div
+				v-for="dice in dices"
+				:key="dice.id"
+				:class="{ selected: dice.isSelected }"
+				class="selection-item"
+			></div>
+		</transition-group>
+		<transition-group appear name="dices" tag="div" class="dices">
+			<div
+				v-for="dice in dices"
+				:key="dice.id"
+				class="dice"
+				:data-nr="dice.nr"
+				@click="click(dice.id)"
+				:class="{ selected: dice.isSelected, disabled: dice.isDisabled || dice.isGone }"
+			>
+				<ul class="dots">
+					<li v-for="(dot, index) in 9" :key="index" class="dot active"></li>
+				</ul>
+				<ul class="dots">
+					<li v-for="(dot, index) in 9" :key="index" class="dot inactive"></li>
+				</ul>
+			</div>
+		</transition-group>
+	</div>
 </template>
 
 <script>
@@ -46,6 +56,9 @@ $margin: $size / 1.618;
 $dot-size: $size / 1.618 / 1.618 / 1.618;
 $padding: 0;
 
+.wrapper {
+	position: relative;
+}
 .dices {
 	position: relative;
 	display: flex;
@@ -68,7 +81,7 @@ $padding: 0;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		filter: url('#goo');
+		filter: url(#goo-l);
 	}
 
 	$mid: calc(50% - #{$dot-size}/ 2);
@@ -204,11 +217,29 @@ $padding: 0;
 			@include active-dot;
 		}
 	}
+
+	// dices:
+	transition: transform 0.5s;
+
+	&.selected {
+		// background-color: red;
+		.inactive {
+			// background: color.$pale;
+			transform: scale(0);
+		}
+	}
+	&.disabled {
+		cursor: default;
+		// opacity: 0.5;
+		.dot.inactive {
+			background: color.$pale;
+		}
+		.dot.active {
+			background: color.$main;
+		}
+	}
 }
 
-.dice {
-	transition: transform 0.5s;
-}
 .dices-enter,
 .dices-leave-to {
 	.dot {
@@ -219,19 +250,41 @@ $padding: 0;
 	position: absolute;
 }
 
-.selected {
-	background-color: red;
-	.inactive {
-		// background: color.$pale;
-	}
-}
-.disabled {
-	// opacity: 0.5;
-	.dot.inactive {
-		background: color.$pale;
-	}
-	.dot.active {
-		background: color.$main;
+.selection {
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	filter: url(#goo-xl);
+
+	&-item {
+		position: relative;
+		height: $size;
+		width: $size;
+		margin: $margin / 2;
+
+		&:after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			right: 0;
+			background: color.$pale;
+			border-radius: 50%;
+			transform: scale(0);
+			transition: transform 0.2s;
+		}
+
+		&.selected:after {
+			transform: scale(1.618);
+		}
 	}
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
 	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
 		<defs>
-			<filter id="text-goo">
-				<feGaussianBlur in="SourceGraphic" stdDeviation="1.7" result="blur" />
+			<filter id="goo-xl">
+				<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
 				<feColorMatrix
 					in="blur"
 					mode="matrix"
-					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 17 -6"
+					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -7"
 					result="goo"
 				/>
 				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
@@ -15,12 +15,12 @@
 	</svg>
 	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
 		<defs>
-			<filter id="small-text-goo">
-				<feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="blur" />
+			<filter id="goo-l">
+				<feGaussianBlur in="SourceGraphic" stdDeviation="6.5" result="blur" />
 				<feColorMatrix
 					in="blur"
 					mode="matrix"
-					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 9 -3"
+					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -6"
 					result="goo"
 				/>
 				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
@@ -29,12 +29,26 @@
 	</svg>
 	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
 		<defs>
-			<filter id="goo">
-				<feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+			<filter id="goo-m">
+				<feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
 				<feColorMatrix
 					in="blur"
 					mode="matrix"
-					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -5"
+					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 14 -6"
+					result="goo"
+				/>
+				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
+			</filter>
+		</defs>
+	</svg>
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+		<defs>
+			<filter id="goo-s">
+				<feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur" />
+				<feColorMatrix
+					in="blur"
+					mode="matrix"
+					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 12 -4"
 					result="goo"
 				/>
 				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
@@ -62,7 +76,7 @@
 				</g>
 			</svg>
 		</button>
-		<Dices class="dices" @dice-click="diceClick" />
+		<Dices class="dices-wrapper" @dice-click="diceClick" />
 		<button class="btn keep" @click="keep" :disabled="boardDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<g class="nc-icon-wrapper" fill="#000000">
@@ -137,7 +151,7 @@ export default {
 	margin: ms(2) auto;
 }
 
-.dices {
+.dices-wrapper {
 	margin: 0 ms(1);
 }
 
@@ -197,6 +211,7 @@ export default {
 	}
 
 	&:disabled {
+		cursor: default;
 		svg path {
 			fill: color.$pale;
 		}

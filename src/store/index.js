@@ -40,13 +40,17 @@ export default createStore({
 				dice = state.dices[id],
 				chain = unfinished(selected)
 
+			console.log('chain', chain)
+			console.log('dice', dice.id)
+
 			// No dice is selected:
 			if (selected.length === 0) dice.isSelected = true
 			// Clicked dice is selected:
-			else if (dice.isSelected) dice.isSelected = false
+			// else if (dice.isSelected ) dice.isSelected = false
 			// Clicked dice is not selected:
-			else if (chain === undefined || parseInt(chain) === dice.nr) dice.isSelected = true
-			else return
+			else if (chain === undefined || parseInt(chain) === dice.nr) {
+				dice.isSelected = !dice.isSelected
+			} else return
 
 			// Disabling dices:
 			dispatch('disable')
