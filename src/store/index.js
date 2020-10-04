@@ -6,6 +6,10 @@ export default createStore({
 		dices: [],
 		nDices: 5,
 		boardDisabled: false,
+		activePlayer: 0,
+		totalScore: [0, 0],
+		roundScore: [0, 0],
+		currentScore: 0,
 	},
 	mutations: {
 		roll(state) {
@@ -17,23 +21,31 @@ export default createStore({
 				isDisabled: false,
 			}))
 		},
+		updateRoundScore(state) {
+			state.roundScore[state.activePlayer] += state.currentScore
+			state.currentScore = 0
+		},
 	},
 	actions: {
-		roll({ state, commit }) {
-			if (state.dices.length === 0) {
-				const max = state.nDices
-				for (let i = 0; i < max; i++) {
-					state.dices.push({
-						id: i,
-						nr: rollDice(),
-						isSelected: false,
-						isGone: false,
-						isDisabled: false,
-					})
-				}
-			} else commit('roll')
+		init({ state }) {
+			state.dices = []
+			const max = state.nDices
+			for (let i = 0; i < max; i++) {
+				state.dices.push({
+					id: i,
+					nr: rollDice(),
+					isSelected: false,
+					isGone: false,
+					isDisabled: false,
+				})
+			}
 		},
-		select({ state, getters, dispatch }, id) {
+		roll({ state, commit, getters }) {
+			commit('roll')
+
+			commit('updateRoundScore')
+		},
+		select({ state, getters, dispatch, commit }, id) {
 			const { selected } = getters,
 				dice = state.dices[id],
 				chain = unfinished(selected)
@@ -42,15 +54,15 @@ export default createStore({
 
 			// No dice is selected:
 			if (selected.length === 0) dice.isSelected = true
-			// Clicked dice is selected:
-			// else if (dice.isSelected ) dice.isSelected = false
 			// Clicked dice is not selected:
-			else if (chain === undefined || parseInt(chain) === dice.nr) {
+			else if (chain === undefined || parseInt(chain) === dice.nr)
 				dice.isSelected = !dice.isSelected
-			} else return
+			else return
 
 			// Disabling dices:
 			dispatch('disable')
+
+			state.currentScore = countPoints(getters.selected)
 		},
 		disable({ state, getters }) {
 			const chain = unfinished(getters.selected)
@@ -73,12 +85,11 @@ export default createStore({
 		},
 	},
 	getters: {
-		selected: state => {
-			return state.dices.filter(dice => dice.isSelected === true)
-			// const ids = []
-			// state.dices.forEach(dice => dice.isSelected && ids.push(dice.id))
-			// return ids
-		},
+		selected: state => state.dices.filter(dice => dice.isSelected === true),
+		getRoundScore: state =>
+			state.roundScore.map((round, i) =>
+				i === state.activePlayer ? round + state.currentScore : round,
+			),
 	},
 })
 
@@ -97,6 +108,27 @@ function countDices(dices) {
 	}
 	dices.forEach(dice => count[dice.nr]++)
 	return count
+}
+
+function countPoints(dices) {
+	dices = dices.filter(dice => !dice.isGone)
+
+	const diceCount = countDices(dices)
+
+	let total = 0
+
+	for (let nr = 1; nr <= 6; nr++) {
+		const n = diceCount[nr]
+		let min = 3
+		if (nr === 1 || nr === 5) min = 1
+
+		const base = nr === 1 ? 100 : nr * 10,
+			multiplier = n < 3 ? n : (n - 2) * 10
+
+		total += n >= min ? base * multiplier : 0
+	}
+
+	return total
 }
 
 // finds uncompleted chain:

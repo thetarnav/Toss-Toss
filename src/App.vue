@@ -56,12 +56,12 @@
 		</defs>
 	</svg>
 	<Player
-		playerName="Player 1"
-		align="left"
-		:totalScore="totalScore[0]"
-		:roundScore="roundScore[0]"
-		:isWinning="winning === 0"
-		:isActive="active === 0"
+		playerName="Player 2"
+		align="right"
+		:totalScore="totalScore[1]"
+		:roundScore="roundScore[1]"
+		:isWinning="winning === 1"
+		:isActive="activePlayer === 1"
 	/>
 
 	<main class="board">
@@ -90,12 +90,12 @@
 	</main>
 
 	<Player
-		playerName="Player 2"
-		align="right"
-		:totalScore="totalScore[1]"
-		:roundScore="roundScore[1]"
-		:isWinning="winning === 1"
-		:isActive="active === 1"
+		playerName="Player 1"
+		align="left"
+		:totalScore="totalScore[0]"
+		:roundScore="roundScore[0]"
+		:isWinning="winning === 0"
+		:isActive="activePlayer === 0"
 	/>
 </template>
 
@@ -112,17 +112,20 @@ export default {
 		Player,
 	},
 	data() {
-		return {
-			totalScore: [1250, 660],
-			roundScore: [0, 450],
-			active: 1,
-		}
+		return {}
 	},
 	computed: {
 		winning() {
-			return this.totalScore[0] > this.totalScore[1] ? 0 : 1
+			return this.totalScore[0] > this.totalScore[1]
+				? 0
+				: this.totalScore[1] > this.totalScore[0]
+				? 1
+				: null
 		},
-		...mapState(['boardDisabled']),
+		...mapState(['boardDisabled', 'activePlayer', 'totalScore']),
+		roundScore() {
+			return this.$store.getters.getRoundScore
+		},
 	},
 	methods: {
 		roll() {
@@ -133,7 +136,7 @@ export default {
 		},
 	},
 	mounted() {
-		this.$store.dispatch('roll')
+		this.$store.dispatch('init')
 	},
 }
 </script>
