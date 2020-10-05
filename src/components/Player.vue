@@ -8,7 +8,9 @@
 		}"
 	>
 		<header class="name">
-			{{ playerName }}
+			<p class="text">
+				{{ playerName }}
+			</p>
 			<span class="crown">
 				<svg
 					version="1.2"
@@ -22,12 +24,12 @@
 				</svg>
 			</span>
 		</header>
-		<div class="scores">
-			<span class="total">
+		<transition-group tag="div" name="scores" class="scores" :duration="400">
+			<span :key="'total'" class="total">
 				{{ totalScore }}
 			</span>
-			<span class="round" v-if="roundScore > 0"> +{{ roundScore }} </span>
-		</div>
+			<span :key="'round'" class="round" v-if="roundScore > 0"> +{{ roundScore }} </span>
+		</transition-group>
 	</div>
 </template>
 
@@ -44,6 +46,7 @@ export default {
 
 <style lang="scss" scoped>
 @use '../scss/library/colors' as color;
+@use '../scss/library/variables' as *;
 @use '../scss/library/ms' as *;
 
 .player {
@@ -56,34 +59,41 @@ export default {
 	display: block;
 	position: relative;
 
-	filter: url(#goo-s);
-	font-size: ms(1);
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-
-	&:after {
+	.text {
+		filter: url(#goo-s);
+		font-size: ms(1);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+	&:before {
 		content: '';
 		position: absolute;
-		left: 100%;
-		width: ms(0);
-		height: ms(0);
+		z-index: -1;
+		$padding-v: ms(-4);
+		$padding-h: ms(-1);
+		top: -$padding-v;
+		bottom: -$padding-v;
+		left: -$padding-h;
+		right: -$padding-h;
+
 		background: color.$pale;
-		border-radius: 50%;
-		transform: scale(0);
-		top: calc(50% - #{ms(0)} / 2);
-		margin-left: ms(-1);
-		transition: clip-path 0.2s;
+		border-radius: ms(0);
+
+		transform: scale(0.5, 0);
+		transition: transform 0.2s $bouncy-easing;
 	}
 }
 
 .crown {
+	--from-right: #{- ms(-1)};
 	position: absolute;
 	right: 100%;
-	margin-right: ms(-1);
+	// margin-right: ms(-1);
 	width: ms(1);
 	height: ms(1);
 	top: calc(50% - #{ms(1)} / 2);
 	transform: scale(0);
+	transition: transform 0.2s $bouncy-easing;
 	path,
 	polygon {
 		fill: color.$pale;
@@ -92,6 +102,8 @@ export default {
 .scores {
 	display: flex;
 	align-items: center;
+	justify-content: center;
+	min-width: 150px;
 }
 .total {
 	filter: url(#goo-m);
@@ -107,15 +119,42 @@ export default {
 	letter-spacing: -0.04em;
 }
 
+// .scores > * {
+// 	transition: all 0.2s $bouncy-easing;
+// 	margin-right: 10px;
+// }
+.scores-enter-active,
+.scores-leave-active,
+.scores-move {
+	transition: all 1s;
+}
+.scores-enter,
+.scores-leave-to {
+	opacity: 0;
+	// transform: translateY(ms(1));
+}
+.scores-leave-active {
+	&.round {
+		transition: opacity 0.4s, transform 10s;
+	}
+	position: absolute;
+}
+
 .rightAlign {
 	margin-left: auto;
 	text-align: right;
 	align-items: flex-end;
+	.scores {
+		// justify-content: flex-end;
+	}
 }
 
 .active {
+	.crown {
+		--from-right: #{- ms(1)};
+	}
 	.name {
-		&:after {
+		&:before {
 			transform: scale(1);
 		}
 	}
@@ -123,7 +162,7 @@ export default {
 
 .winning {
 	.crown {
-		transform: scale(1);
+		transform: scale(1) translateX(var(--from-right));
 	}
 }
 </style>

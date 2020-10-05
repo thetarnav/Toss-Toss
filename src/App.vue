@@ -147,6 +147,7 @@ export default {
 
 <style lang="scss">
 @use 'scss/library/colors' as color;
+@use 'scss/library/variables' as *;
 @use 'scss/library/ms' as *;
 
 .board {
@@ -187,8 +188,9 @@ export default {
 		height: 100%;
 		border-radius: 50%;
 		background-color: color.$pale;
-		clip-path: circle(0 at 50% 50%);
-		transition: clip-path 0.2s;
+		clip-path: circle(50% at 50% 50%);
+		transform: scale(0);
+		transition: transform 0.2s $bouncy-easing;
 	}
 
 	&:not(:disabled):hover {
@@ -196,23 +198,8 @@ export default {
 			fill: color.$dark;
 		}
 		&::before {
-			clip-path: circle(100% at 50% 50%);
+			transform: scale(1);
 		}
-	}
-
-	@keyframes circle-animation {
-		50% {
-			opacity: 1;
-			clip-path: circle(100% at 50% 50%);
-		}
-		to {
-			opacity: 0;
-			clip-path: circle(0 at 50% 50%);
-		}
-	}
-
-	&:not(:disabled):active:before {
-		animation: circle-animation 0.4s;
 	}
 
 	&:disabled {

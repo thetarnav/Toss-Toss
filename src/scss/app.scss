@@ -3,6 +3,11 @@
 @use 'library/colors' as color;
 @use 'library/ms' as *;
 
+*::selection {
+	background: color.$pale;
+	color: color.$white;
+}
+
 .clearfix::after {
 	content: '';
 	display: table;

@@ -49,6 +49,7 @@ export default {
 
 <style lang="scss" scoped>
 @use '../scss/library/colors' as color;
+@use '../scss/library/variables' as *;
 @use '../scss/library/ms' as *;
 
 $size: gs(2);
@@ -135,7 +136,7 @@ $padding: 0;
 		background: color.$main;
 		border-radius: 50%;
 
-		transition: transform 0.4s, background 0.2s;
+		transition: transform 0.4s $bouncy-easing, background 0.2s;
 		&.active {
 			background: color.$dark;
 			@include hidden-dot;
@@ -219,7 +220,7 @@ $padding: 0;
 	}
 
 	// dices:
-	transition: transform 0.5s;
+	transition: transform 0.5s $bouncy-easing;
 
 	&.selected {
 		.inactive {
@@ -285,7 +286,7 @@ $padding: 0;
 			background: color.$pale;
 			border-radius: 50%;
 			transform: scale(0);
-			transition: transform 0.2s;
+			transition: transform 0.2s $bouncy-easing;
 		}
 
 		&.selected:after {
