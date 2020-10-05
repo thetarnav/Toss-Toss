@@ -2,8 +2,7 @@ export const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
 export const flipP = p => (p >= 0 ? Math.abs(p - 1) : Math.abs(p) - 1)
 
-export const flipVal = (val, min, max) =>
-	Math.abs(val * (Math.sign(val) || 1) - max) + min
+export const flipVal = (val, min, max) => Math.abs(val * (Math.sign(val) || 1) - max) + min
 
 export const pToVal = (p, zero, hundred) => p * (hundred - zero) + zero
 
@@ -21,9 +20,7 @@ export function valToPwMid(value, min, max, turn = pToVal(0.5, min, max)) {
 		turn = flipVal(turn, min, max)
 		value = flipVal(value, min, max)
 	}
-	return value < turn
-		? (value - turn) / (turn - min)
-		: (value - turn) / (max - turn)
+	return value < turn ? (value - turn) / (turn - min) : (value - turn) / (max - turn)
 }
 
 // function to map a value from one range to another range
@@ -47,6 +44,12 @@ export const round = (number, toDecimal = 1) =>
 
 export const setCssProps = (el, ...pairs) =>
 	pairs.forEach(pair => el.style.setProperty(pair[0], pair[1]))
+
+export const animateCssClass = (el, className) => {
+	el.classList.remove(className)
+	void el.offsetWidth
+	el.classList.add(className)
+}
 
 export const stayInRange = (value, min, max, behavior = 'loop') => {
 	// behaviors:
@@ -79,9 +82,7 @@ export const stayInRange = (value, min, max, behavior = 'loop') => {
 			exceed = Math.abs(fullExceed) - quotient * range
 
 		value =
-			(value < min && quotient % 2 === 0) || quotient % 2 !== 0
-				? min + exceed
-				: max - exceed
+			(value < min && quotient % 2 === 0) || quotient % 2 !== 0 ? min + exceed : max - exceed
 	} else if (behavior == 'flat') value = value < min ? min : max
 
 	return value
@@ -157,10 +158,7 @@ export function setUrlVar(key = null, value = null, dictionary = null) {
 	if (key !== null) dict[key] = value
 
 	for (let k in dict)
-		string +=
-			dict[k] !== null
-				? k + '=' + encodeURIComponent(dict[k]) + '&'
-				: k + '&'
+		string += dict[k] !== null ? k + '=' + encodeURIComponent(dict[k]) + '&' : k + '&'
 
 	history.replaceState(null, null, location.pathname + string.slice(0, -1))
 }
@@ -219,21 +217,12 @@ export var serialize = function(form) {
 			for (var n = 0; n < field.options.length; n++) {
 				if (!field.options[n].selected) continue
 				serialized.push(
-					encodeURIComponent(field.name) +
-						'=' +
-						encodeURIComponent(field.options[n].value),
+					encodeURIComponent(field.name) + '=' + encodeURIComponent(field.options[n].value),
 				)
 			}
-		} else if (
-			(field.type !== 'checkbox' && field.type !== 'radio') ||
-			field.checked
-		) {
+		} else if ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked) {
 			// Convert field data to a query string
-			serialized.push(
-				encodeURIComponent(field.name) +
-					'=' +
-					encodeURIComponent(field.value),
-			)
+			serialized.push(encodeURIComponent(field.name) + '=' + encodeURIComponent(field.value))
 		}
 	}
 

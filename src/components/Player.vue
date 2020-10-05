@@ -25,22 +25,31 @@
 			</span>
 		</header>
 		<transition-group tag="div" name="scores" class="scores" :duration="400">
-			<span :key="'total'" class="total">
+			<span key="totalScore" ref="totalScore" class="total">
 				{{ totalScore }}
 			</span>
-			<span :key="'round'" class="round" v-if="roundScore > 0"> +{{ roundScore }} </span>
+			<span key="roundScore" ref="roundScore" class="round animate" v-if="roundScore > 0">
+				+{{ roundScore }}
+			</span>
 		</transition-group>
 	</div>
 </template>
 
 <script>
+import { animateCssClass } from '../js/utilities'
+
 export default {
 	name: 'Player',
 	props: ['playerName', 'align', 'totalScore', 'roundScore', 'isWinning', 'isActive'],
-	data() {
-		return {}
+	watch: {
+		totalScore() {
+			this.$refs.totalScore && animateCssClass(this.$refs.totalScore, 'animate')
+		},
+		roundScore(after, before) {
+			if (!this.$refs.roundScore || after <= before) return
+			animateCssClass(this.$refs.roundScore, 'animate')
+		},
 	},
-	methods: {},
 }
 </script>
 
@@ -88,7 +97,6 @@ export default {
 	--from-right: #{- ms(-1)};
 	position: absolute;
 	right: 100%;
-	// margin-right: ms(-1);
 	width: ms(1);
 	height: ms(1);
 	top: calc(50% - #{ms(1)} / 2);
@@ -118,11 +126,18 @@ export default {
 	margin-left: gs(0.5);
 	letter-spacing: -0.04em;
 }
+.round,
+.total {
+	@keyframes animate-score {
+		50% {
+			transform: scale(1.618);
+		}
+	}
+	&.animate {
+		animation: animate-score 0.5s;
+	}
+}
 
-// .scores > * {
-// 	transition: all 0.2s $bouncy-easing;
-// 	margin-right: 10px;
-// }
 .scores-enter-active,
 .scores-leave-active,
 .scores-move {
@@ -131,7 +146,6 @@ export default {
 .scores-enter,
 .scores-leave-to {
 	opacity: 0;
-	// transform: translateY(ms(1));
 }
 .scores-leave-active {
 	&.round {
@@ -144,9 +158,6 @@ export default {
 	margin-left: auto;
 	text-align: right;
 	align-items: flex-end;
-	.scores {
-		// justify-content: flex-end;
-	}
 }
 
 .active {
