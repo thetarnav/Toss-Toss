@@ -4,7 +4,7 @@ import { random } from '@/js/utilities'
 export default createStore({
 	state: {
 		dices: [],
-		nDices: 5,
+		nDices: 6,
 		boardDisabled: false,
 		activePlayer: 0,
 		totalScore: [0, 0],
@@ -45,6 +45,7 @@ export default createStore({
 
 			commit('updateRoundScore')
 		},
+		keep({ state, commit, getters }) {},
 		select({ state, getters, dispatch, commit }, id) {
 			const { selected } = getters,
 				dice = state.dices[id],

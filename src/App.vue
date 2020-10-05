@@ -134,6 +134,9 @@ export default {
 		diceClick(diceId) {
 			this.$store.dispatch('select', diceId)
 		},
+		keep() {
+			this.$store.dispatch('keep')
+		},
 	},
 	mounted() {
 		this.$store.dispatch('init')
