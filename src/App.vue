@@ -65,7 +65,7 @@
 	/>
 
 	<main class="board">
-		<button class="btn roll" @click="roll" :disabled="boardDisabled">
+		<button class="btn roll" @click="roll" :disabled="boardDisabled || rollDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<title>ic24-rotate</title>
 				<g fill="#000000">
@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 import Dices from '@/components/Dices'
 import Player from '@/components/Player'
@@ -122,10 +122,9 @@ export default {
 				? 1
 				: null
 		},
-		...mapState(['boardDisabled', 'activePlayer', 'totalScore']),
-		roundScore() {
-			return this.$store.getters.getRoundScore
-		},
+		...mapState(['activePlayer', 'totalScore', 'rollDisabled']),
+		...mapGetters(['boardDisabled']),
+		...mapGetters({ roundScore: 'getRoundScore' }),
 	},
 	methods: {
 		roll() {

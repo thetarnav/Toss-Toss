@@ -5,8 +5,9 @@ export default createStore({
 	state: {
 		dices: [],
 		nDices: 6,
-		boardDisabled: false,
 		activePlayer: 0,
+		rollDisabled: false,
+		winner: null,
 		totalScore: [0, 0],
 		roundScore: [0, 0],
 		currentScore: 0,
@@ -21,13 +22,25 @@ export default createStore({
 				isDisabled: false,
 			}))
 		},
-		updateRoundScore(state) {
-			state.roundScore[state.activePlayer] += state.currentScore
+		updateRoundScore(state, score) {
+			state.roundScore[state.activePlayer] =
+				score === undefined ? state.currentScore + state.roundScore[state.activePlayer] : score
 			state.currentScore = 0
+		},
+		updateTotalScore(state) {
+			state.totalScore[state.activePlayer] +=
+				state.currentScore + state.roundScore[state.activePlayer]
+
+			state.roundScore[state.activePlayer] = 0
+			state.currentScore = 0
+		},
+		playerSwitch(state, player) {
+			player = player || (state.activePlayer === 0 ? 1 : 0)
+			state.activePlayer = player
 		},
 	},
 	actions: {
-		init({ state }) {
+		init({ state, dispatch }) {
 			state.dices = []
 			const max = state.nDices
 			for (let i = 0; i < max; i++) {
@@ -39,13 +52,29 @@ export default createStore({
 					isDisabled: false,
 				})
 			}
+
+			dispatch('checkRoundOver')
 		},
-		roll({ state, commit, getters }) {
+		roll({ commit, dispatch }) {
 			commit('roll')
 
 			commit('updateRoundScore')
+
+			dispatch('checkRoundOver')
 		},
-		keep({ state, commit, getters }) {},
+		keep({ state, commit, getters, dispatch }) {
+			commit('updateTotalScore')
+			commit('playerSwitch')
+			dispatch('init')
+		},
+		checkRoundOver({ state, commit, getters, dispatch }) {
+			const possiblePoints = countPoints(state.dices)
+
+			if (possiblePoints === 0) {
+				commit('updateRoundScore', 0)
+				dispatch('keep')
+			}
+		},
 		select({ state, getters, dispatch, commit }, id) {
 			const { selected } = getters,
 				dice = state.dices[id],
@@ -66,31 +95,35 @@ export default createStore({
 			state.currentScore = countPoints(getters.selected)
 		},
 		disable({ state, getters }) {
-			const chain = unfinished(getters.selected)
-			let noneDisabled = true
+			const { selected, gone } = getters,
+				chain = unfinished(selected)
 
 			state.dices = state.dices.map(dice => {
 				let isDisabled
 				if (chain === undefined || parseInt(chain) === dice.nr) isDisabled = false
-				else {
-					isDisabled = true
-					noneDisabled = false
-				}
+				else isDisabled = true
+
 				return {
 					...dice,
 					isDisabled,
 				}
 			})
 
-			state.boardDisabled = !noneDisabled
+			state.rollDisabled = selected.length + gone.length === state.nDices
 		},
 	},
 	getters: {
 		selected: state => state.dices.filter(dice => dice.isSelected === true),
+		gone: state => state.dices.filter(dice => dice.isGone === true),
 		getRoundScore: state =>
 			state.roundScore.map((round, i) =>
 				i === state.activePlayer ? round + state.currentScore : round,
 			),
+		boardDisabled: (state, getters) => {
+			const { selected } = getters,
+				chain = unfinished(selected)
+			return chain !== undefined || selected.length === 0 ? true : false
+		},
 	},
 })
 
