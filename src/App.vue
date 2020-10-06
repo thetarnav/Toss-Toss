@@ -55,13 +55,7 @@
 			</filter>
 		</defs>
 	</svg>
-	<Player
-		:playerIndex="1"
-		align="right"
-		:roundScore="roundScore[1]"
-		:isWinning="winning === 1"
-		:isActive="activePlayer === 1"
-	/>
+	<Player :playerIndex="1" align="right" />
 
 	<main class="board">
 		<button class="btn roll" @click="roll" :disabled="buttonsDisabled || rollDisabled">
@@ -88,13 +82,7 @@
 		</button>
 	</main>
 
-	<Player
-		:playerIndex="0"
-		align="left"
-		:roundScore="roundScore[0]"
-		:isWinning="winning === 0"
-		:isActive="activePlayer === 0"
-	/>
+	<Player :playerIndex="0" align="left" />
 </template>
 
 <script>
@@ -113,20 +101,12 @@ export default {
 		return {}
 	},
 	computed: {
-		winning() {
-			return this.totalScore[0] > this.totalScore[1]
-				? 0
-				: this.totalScore[1] > this.totalScore[0]
-				? 1
-				: null
-		},
 		...mapState('game', {
 			activePlayer: state => state.activePlayer,
 			totalScore: state => state.totalScore,
 			rollDisabled: state => state.rollDisabled,
 		}),
 		...mapGetters('game', ['buttonsDisabled']),
-		...mapGetters({ roundScore: 'game/roundScore' }),
 	},
 	methods: {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),

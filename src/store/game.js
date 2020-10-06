@@ -148,6 +148,12 @@ export default {
 				chain = unfinished(selected)
 			return chain !== undefined || selected.length === 0 || state.lost || state.winner !== null
 		},
+		winning: state => {
+			const [one, two] = state.totalScore
+			if (one > two) return 0
+			if (two > one) return 1
+			return null
+		},
 	},
 }
 

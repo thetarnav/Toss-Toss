@@ -41,27 +41,33 @@ import { animateCssClass } from '../js/utilities'
 
 export default {
 	name: 'Player',
-	props: ['playerIndex', 'align', 'isWinning', 'isActive'],
+	props: ['playerIndex', 'align'],
 	computed: {
-		...mapState('game', ['lost', 'totalScore', 'roundScore']),
+		...mapState('game', ['lost']),
 		playerName() {
 			if (typeof this.playerIndex !== 'number') return
 			return this.$store.getters.playerData(this.playerIndex).name
 		},
 		total() {
-			return this.totalScore[this.playerIndex]
+			return this.$store.state.game.totalScore[this.playerIndex]
 		},
 		round() {
 			return this.$store.getters['game/roundScore'][this.playerIndex]
 		},
+		isWinning() {
+			return this.$store.getters['game/winning'] === this.playerIndex
+		},
+		isActive() {
+			return this.$store.state.game.activePlayer === this.playerIndex
+		},
 	},
 	watch: {
-		totalScore() {
-			this.$refs.totalScore && animateCssClass(this.$refs.totalScore, 'animate')
+		total() {
+			this.$refs.total && animateCssClass(this.$refs.total, 'animate')
 		},
-		roundScore(after, before) {
-			if (!this.$refs.roundScore || after <= before) return
-			animateCssClass(this.$refs.roundScore, 'animate')
+		round(after, before) {
+			if (!this.$refs.round || after <= before) return
+			animateCssClass(this.$refs.round, 'animate')
 		},
 	},
 }
