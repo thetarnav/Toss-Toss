@@ -1,5 +1,5 @@
 <template>
-	<div class="wrapper">
+	<div class="wrapper" :class="{ hidden: winner !== null }">
 		<transition-group name="selection" tag="div" class="selection">
 			<div
 				v-for="dice in dices"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
 	name: 'Dices',
@@ -37,12 +37,10 @@ export default {
 		return {}
 	},
 	computed: {
-		...mapState(['dices']),
+		...mapState('game', ['dices', 'winner']),
 	},
 	methods: {
-		click(id) {
-			this.$emit('dice-click', id)
-		},
+		...mapActions({ click: 'game/select' }),
 	},
 }
 </script>
@@ -59,6 +57,14 @@ $padding: 0;
 
 .wrapper {
 	position: relative;
+	&.hidden {
+		.dice {
+			pointer-events: none;
+			.dot {
+				transform: scale(0) !important;
+			}
+		}
+	}
 }
 .dices {
 	position: relative;

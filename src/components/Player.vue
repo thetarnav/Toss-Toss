@@ -25,22 +25,36 @@
 			</span>
 		</header>
 		<transition-group tag="div" name="scores" class="scores" :duration="400">
-			<span key="totalScore" ref="totalScore" class="total">
-				{{ totalScore }}
+			<span key="total" ref="total" class="total">
+				{{ total }}
 			</span>
-			<span key="roundScore" ref="roundScore" class="round animate" v-if="roundScore > 0">
-				+{{ roundScore }}
+			<span key="round" ref="round" class="round animate" :class="{ lost }" v-if="round > 0">
+				+{{ round }}
 			</span>
 		</transition-group>
 	</div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { animateCssClass } from '../js/utilities'
 
 export default {
 	name: 'Player',
-	props: ['playerName', 'align', 'totalScore', 'roundScore', 'isWinning', 'isActive'],
+	props: ['playerIndex', 'align', 'isWinning', 'isActive'],
+	computed: {
+		...mapState('game', ['lost', 'totalScore', 'roundScore']),
+		playerName() {
+			if (typeof this.playerIndex !== 'number') return
+			return this.$store.getters.playerData(this.playerIndex).name
+		},
+		total() {
+			return this.totalScore[this.playerIndex]
+		},
+		round() {
+			return this.$store.getters['game/roundScore'][this.playerIndex]
+		},
+	},
 	watch: {
 		totalScore() {
 			this.$refs.totalScore && animateCssClass(this.$refs.totalScore, 'animate')
@@ -121,10 +135,28 @@ export default {
 	letter-spacing: -0.02em;
 }
 .round {
+	position: relative;
 	filter: url(#goo-s);
 	font-size: ms(1);
 	margin-left: gs(0.5);
 	letter-spacing: -0.04em;
+
+	&:after {
+		content: '';
+		position: absolute;
+		height: ms(-3);
+		width: 100%;
+		background: color.$pale;
+		top: calc(50% - #{ms(-3)} / 2);
+		left: 0.5ch;
+		transition: transform 0.2s $bouncy-easing;
+	}
+	&:not(.lost):after {
+		transform: translateX(-50%) scale(0, 1);
+	}
+	&.lost {
+		color: color.$pale;
+	}
 }
 .round,
 .total {

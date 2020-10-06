@@ -56,16 +56,15 @@
 		</defs>
 	</svg>
 	<Player
-		playerName="Player 2"
+		:playerIndex="1"
 		align="right"
-		:totalScore="totalScore[1]"
 		:roundScore="roundScore[1]"
 		:isWinning="winning === 1"
 		:isActive="activePlayer === 1"
 	/>
 
 	<main class="board">
-		<button class="btn roll" @click="roll" :disabled="boardDisabled || rollDisabled">
+		<button class="btn roll" @click="roll" :disabled="buttonsDisabled || rollDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<title>ic24-rotate</title>
 				<g fill="#000000">
@@ -76,8 +75,8 @@
 				</g>
 			</svg>
 		</button>
-		<Dices class="dices-wrapper" @dice-click="diceClick" />
-		<button class="btn keep" @click="keep" :disabled="boardDisabled">
+		<Dices class="dices-wrapper" />
+		<button class="btn keep" @click="keep" :disabled="buttonsDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<g class="nc-icon-wrapper" fill="#000000">
 					<path
@@ -90,9 +89,8 @@
 	</main>
 
 	<Player
-		playerName="Player 1"
+		:playerIndex="0"
 		align="left"
-		:totalScore="totalScore[0]"
 		:roundScore="roundScore[0]"
 		:isWinning="winning === 0"
 		:isActive="activePlayer === 0"
@@ -100,7 +98,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 import Dices from '@/components/Dices'
 import Player from '@/components/Player'
@@ -122,23 +120,19 @@ export default {
 				? 1
 				: null
 		},
-		...mapState(['activePlayer', 'totalScore', 'rollDisabled']),
-		...mapGetters(['boardDisabled']),
-		...mapGetters({ roundScore: 'getRoundScore' }),
+		...mapState('game', {
+			activePlayer: state => state.activePlayer,
+			totalScore: state => state.totalScore,
+			rollDisabled: state => state.rollDisabled,
+		}),
+		...mapGetters('game', ['buttonsDisabled']),
+		...mapGetters({ roundScore: 'game/roundScore' }),
 	},
 	methods: {
-		roll() {
-			this.$store.dispatch('roll')
-		},
-		diceClick(diceId) {
-			this.$store.dispatch('select', diceId)
-		},
-		keep() {
-			this.$store.dispatch('keep')
-		},
+		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
 	},
 	mounted() {
-		this.$store.dispatch('init')
+		this.$store.dispatch('game/init')
 	},
 }
 </script>

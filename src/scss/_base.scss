@@ -12,6 +12,13 @@ body {
 		font-variant-ligatures: common-ligatures;
 		font-variant-numeric: oldstyle-nums;
 	}
+
+	@supports (kerning: normal) {
+		kerning: normal;
+	}
+	@supports not (kerning: normal) {
+		font-feature-settings: 'kern' 1;
+	}
 }
 
 * {
