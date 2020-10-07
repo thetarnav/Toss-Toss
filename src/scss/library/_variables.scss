@@ -1,1 +1,6 @@
+@use './ms' as *;
+@use './colors' as color;
+
 $bouncy-easing: cubic-bezier(0.51, 0.06, 0.56, 1.37);
+$dice-size: gs(2);
+$dice-margin: ms(-1, $dice-size);

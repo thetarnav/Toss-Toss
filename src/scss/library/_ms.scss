@@ -1,6 +1,6 @@
 @use "sass:math";
 
-$base: 20px;
+$font-base: 20px;
 $ratio: 1.618;
 $grid-size: 30px;
 
@@ -10,8 +10,8 @@ $caption-type-av: 0.5;
 
 @function ms(
 	$value,
+	$ms-base: $grid-size,
 	$ms-ratio: $ratio,
-	$ms-base: $base,
 	$ms-goal-av: $text-type-av,
 	$ms-av: $ms-goal-av
 ) {
@@ -25,4 +25,8 @@ $caption-type-av: 0.5;
 @function gs($value, $gs-size: $grid-size) {
 	// @return calc(#{$value} * #{$gs-size});
 	@return $value * $gs-size;
+}
+
+@function font-size($value) {
+	@return ms($value, $font-base);
 }

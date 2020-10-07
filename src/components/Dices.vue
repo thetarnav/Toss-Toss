@@ -1,6 +1,6 @@
 <template>
 	<transition appear name="wrapper" :duration="400">
-		<div class="wrapper" :class="{ hidden: winner !== null }">
+		<div class="wrapper" :class="{ hidden: winner !== null || true }">
 			<transition-group name="selection" tag="div" class="selection">
 				<div
 					v-for="dice in dices"
@@ -56,14 +56,10 @@ export default {
 @use '../scss/library/variables' as *;
 @use '../scss/library/ms' as *;
 
-$size: gs(2);
-$margin: $size / 1.618;
-$dot-size: $size / 1.618 / 1.618 / 1.618;
+$size: $dice-size;
+$margin: $dice-margin;
+$dot-size: ms(-3, $dice-size);
 $padding: 0;
-
-.outer-wrapper {
-	width: $size * 3 + $margin * 3;
-}
 
 @mixin hidden-board {
 	.dice {
@@ -92,7 +88,8 @@ $padding: 0;
 	justify-content: center;
 	align-items: center;
 	align-content: center;
-	max-width: $size * 3 + $margin * 3;
+	width: $size * 3 + $margin * 3;
+	min-height: $size * 2 + $margin * 2;
 }
 .dice {
 	position: relative;

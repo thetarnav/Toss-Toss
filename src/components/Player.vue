@@ -76,50 +76,34 @@ export default {
 <style lang="scss" scoped>
 @use '../scss/library/colors' as color;
 @use '../scss/library/variables' as *;
+@use '../scss/library/mixins' as *;
 @use '../scss/library/ms' as *;
 
 .player {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	filter: blur(0.45px);
+	filter: blur(0.4px);
 }
 .name {
 	display: block;
 	position: relative;
 
 	.text {
-		filter: url(#goo-s);
-		font-size: ms(1);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		@include uppercase-subheading;
 	}
-	&:before {
-		content: '';
-		position: absolute;
-		z-index: -1;
-		$padding-v: ms(-4);
-		$padding-h: ms(-1);
-		top: -$padding-v;
-		bottom: -$padding-v;
-		left: -$padding-h;
-		right: -$padding-h;
-
-		background: color.$pale;
-		border-radius: ms(0);
-
-		transform: scale(0.5, 0);
-		transition: transform 0.2s $bouncy-easing;
-	}
+	@include pill-background($hidden: true);
 }
 
 .crown {
 	--from-right: #{- ms(-1)};
 	position: absolute;
 	right: 100%;
-	width: ms(1);
-	height: ms(1);
-	top: calc(50% - #{ms(1)} / 2);
+	$size: ms(-1, $dice-size);
+	width: $size;
+	height: $size;
+	top: calc(50% - #{$size} / 2);
+	filter: url(#goo-s);
 	transform: scale(0);
 	transition: transform 0.2s $bouncy-easing;
 	path,
@@ -134,16 +118,13 @@ export default {
 	min-width: 150px;
 }
 .total {
-	filter: url(#goo-m);
-	font-size: ms(2);
-	font-weight: 800;
+	@include bold-heading;
 	color: color.$main;
-	letter-spacing: -0.02em;
 }
 .round {
 	position: relative;
 	filter: url(#goo-s);
-	font-size: ms(1);
+	font-size: font-size(1);
 	margin-left: gs(0.5);
 	letter-spacing: -0.04em;
 

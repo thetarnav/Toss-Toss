@@ -59,7 +59,7 @@ module.exports = {
 		'no-useless-return': 'warn',
 		'space-before-function-paren': 'off',
 		'max-len': 'warn',
-		'no-undef': 'warn',
+		'no-undef': 'error',
 		'prefer-arrow-callback': 'warn',
 		'prefer-template': 'warn',
 		'spaced-comment': 'warn',

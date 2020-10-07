@@ -1,0 +1,53 @@
+@use './ms' as *;
+@use './colors' as color;
+@use './variables' as *;
+
+@mixin uppercase-subheading {
+	font-size: font-size(1);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	filter: url(#goo-s);
+}
+
+@mixin bold-heading {
+	filter: url(#goo-m);
+	font-size: font-size(2);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+}
+
+@mixin small-caption {
+	font-family: 'Averia Sans Libre', cursive;
+	font-size: font-size(1);
+	line-height: gs(1.5);
+	margin-bottom: ms(-3);
+	font-weight: 400;
+	letter-spacing: -0.04em;
+}
+
+@mixin pill-background($color: color.$pale, $hidden: false) {
+	&:before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		$padding-v: ms(-4);
+		$padding-h: ms(-1);
+		top: -$padding-v;
+		bottom: -$padding-v;
+		left: -$padding-h;
+		right: -$padding-h;
+
+		background: $color;
+		border-radius: ms(0);
+
+		@if ($hidden == true) {
+			transform: scale(0.5, 0);
+			transition: transform 0.2s $bouncy-easing;
+		}
+	}
+}
+
+@mixin btn($color: color.$main) {
+	border: none;
+	outline: none;
+}

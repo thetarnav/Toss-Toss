@@ -1,6 +1,7 @@
 @use 'base';
 
 @use 'library/colors' as color;
+@use 'library/variables' as *;
 @use 'library/ms' as *;
 
 *::selection {
@@ -27,7 +28,7 @@ body {
 }
 
 #app {
-	max-width: ms(7);
+	max-width: gs(20);
 	width: 100%;
 	display: flex;
 	flex-direction: column;

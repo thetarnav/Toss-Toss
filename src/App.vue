@@ -7,9 +7,9 @@
 					in="blur"
 					mode="matrix"
 					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 35 -7"
-					result="goo"
+					result="goo-xl"
 				/>
-				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
+				<feComposite in="SourceGraphic" in2="goo-xl" operator="atop" />
 			</filter>
 		</defs>
 	</svg>
@@ -21,9 +21,9 @@
 					in="blur"
 					mode="matrix"
 					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 28 -6"
-					result="goo"
+					result="goo-l"
 				/>
-				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
+				<feComposite in="SourceGraphic" in2="goo-l" operator="atop" />
 			</filter>
 		</defs>
 	</svg>
@@ -35,9 +35,9 @@
 					in="blur"
 					mode="matrix"
 					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 14 -6"
-					result="goo"
+					result="goo-m"
 				/>
-				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
+				<feComposite in="SourceGraphic" in2="goo-m" operator="atop" />
 			</filter>
 		</defs>
 	</svg>
@@ -49,12 +49,27 @@
 					in="blur"
 					mode="matrix"
 					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 12 -4"
-					result="goo"
+					result="goo-s"
 				/>
-				<feComposite in="SourceGraphic" in2="goo" operator="atop" />
+				<feComposite in="SourceGraphic" in2="goo-s" operator="atop" />
 			</filter>
 		</defs>
 	</svg>
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
+		<defs>
+			<filter id="button-goo">
+				<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+				<feColorMatrix
+					in="blur"
+					mode="matrix"
+					values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -8"
+					result="button-goo"
+				/>
+				<feComposite in="SourceGraphic" in2="button-goo" operator="atop" />
+			</filter>
+		</defs>
+	</svg>
+
 	<Player :playerIndex="1" align="right" />
 
 	<main class="board">
@@ -69,7 +84,7 @@
 				</g>
 			</svg>
 		</button>
-		<Dices />
+		<Dices class="dices-wrapper" />
 		<button class="btn keep" @click="keep" :disabled="buttonsDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<g class="nc-icon-wrapper" fill="#000000">
@@ -80,6 +95,7 @@
 				</g>
 			</svg>
 		</button>
+		<GameResults class="game-results" v-if="winner !== null || true" />
 	</main>
 
 	<Player :playerIndex="0" align="left" />
@@ -90,12 +106,14 @@ import { mapState, mapGetters, mapActions } from 'vuex'
 
 import Player from '@/components/Player'
 import Dices from '@/components/Dices'
+import GameResults from '@/components/GameResults'
 
 export default {
 	name: 'App',
 	components: {
 		Dices,
 		Player,
+		GameResults,
 	},
 	data() {
 		return {}
@@ -115,38 +133,31 @@ export default {
 
 <style lang="scss" src="./scss/app.scss" />
 
-<style lang="scss">
+<style lang="scss" scoped>
 @use 'scss/library/colors' as color;
 @use 'scss/library/variables' as *;
 @use 'scss/library/ms' as *;
 
-.yoo-enter-active {
-	transition: all 0.3s ease-out;
-}
-
-.yoo-leave-active {
-	transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.yoo-enter-from,
-.yoo-leave-to {
-	transform: translateX(20px);
-	opacity: 0;
-}
-
 .board {
+	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin: ms(2) auto;
+	margin: ms(1) auto;
 }
 
 .dices-wrapper {
-	margin: 0 ms(1);
+	margin: 0 ms(0);
+}
+
+.game-results {
+	position: absolute;
+	width: $dice-size * 3 + $dice-margin * 3;
+	min-height: $dice-size * 2 + $dice-margin * 2;
 }
 
 .btn {
-	$size: gs(2);
+	$size: $dice-size;
 	position: relative;
 	width: $size;
 	height: $size;
@@ -156,7 +167,7 @@ export default {
 	outline: none;
 	cursor: pointer;
 	svg {
-		width: $size/1.618;
+		width: ms(-1, $dice-size);
 		path {
 			fill: color.$main;
 			transition: fill 0.2s;
