@@ -1,17 +1,21 @@
 import { random } from '@/js/utilities'
 
+const initialState = {
+	dices: [],
+	nDices: 6,
+	activePlayer: 0,
+	rollDisabled: false,
+	lost: false,
+	winner: null,
+	totalScore: [0, 0],
+	roundScore: [0, 0],
+	currentScore: 0,
+}
+
 export default {
 	namespaced: true,
 	state: {
-		dices: [],
-		nDices: 6,
-		activePlayer: 0,
-		rollDisabled: false,
-		lost: false,
-		winner: null,
-		totalScore: [0, 0],
-		roundScore: [0, 0],
-		currentScore: 0,
+		...initialState,
 	},
 	mutations: {
 		roll(state) {
@@ -41,7 +45,12 @@ export default {
 		},
 	},
 	actions: {
-		init({ state, dispatch }) {
+		initGame({ state, dispatch }) {
+			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
+			state.totalScore = [0, 0]
+			dispatch('initRound')
+		},
+		initRound({ state, dispatch }) {
 			state.lost = false
 			state.dices = []
 
@@ -91,7 +100,7 @@ export default {
 
 			function restart() {
 				commit('playerSwitch')
-				dispatch('init')
+				dispatch('initRound')
 			}
 		},
 		checkRoundOver({ state, commit, getters, dispatch }) {

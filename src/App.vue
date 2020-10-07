@@ -95,7 +95,7 @@
 				</g>
 			</svg>
 		</button>
-		<GameResults class="game-results" v-if="winner !== null || true" />
+		<GameResults class="game-results" v-if="winner !== null" />
 	</main>
 
 	<Player :playerIndex="0" align="left" />
@@ -126,7 +126,7 @@ export default {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
 	},
 	mounted() {
-		this.$store.dispatch('game/init')
+		this.$store.dispatch('game/initRound')
 	},
 }
 </script>

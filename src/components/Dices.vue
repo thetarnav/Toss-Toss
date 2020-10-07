@@ -1,6 +1,6 @@
 <template>
 	<transition appear name="wrapper" :duration="400">
-		<div class="wrapper" :class="{ hidden: winner !== null || true }">
+		<div class="wrapper" :class="{ hidden: winner !== null }">
 			<transition-group name="selection" tag="div" class="selection">
 				<div
 					v-for="dice in dices"

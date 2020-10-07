@@ -1,12 +1,14 @@
 <template>
 	<button ref="button" class="gooey-button">
-		<slot> </slot>
+		<div class="slot">
+			<slot></slot>
+		</div>
 		<div class="gooey-wrapper">
-			<span class="mouseDot" ref="dot"></span>
+			<span class="mouse-dot" ref="dot"></span>
 			<div class="background"></div>
 		</div>
+		<GlobalEvents @mousemove="debounceEvent" @mouseenter="handleMove" @mouseleave="reset" />
 	</button>
-	<GlobalEvents @mousemove="debounceEvent" @mouseenter="handleMove" />
 </template>
 
 <script>
@@ -36,21 +38,21 @@ export default {
 	name: 'GooeyButton',
 	components: { GlobalEvents },
 	data() {
-		return { isQuick: false, reset: true }
+		return { isQuick: false, bounds: null }
 	},
 	methods: {
 		handleMove(e) {
+			if (this.bounds === null) return
+
 			const { x, y } = e,
-				el = this.$refs.button,
 				{ dot } = this.$refs,
-				bounds = el.getBoundingClientRect(),
+				{ bounds } = this,
 				{ left, top } = bounds
 
 			let p = calcDistance(e, bounds)
 			p = clamp(p, 0, 1)
 
 			if (p > 0) {
-				this.reset = false
 				this.isQuick = true
 
 				const moveX = x - left,
@@ -61,88 +63,31 @@ export default {
 					translateX: moveX,
 					translateY: moveY,
 					scale: p,
-					duration: 1000,
+					duration: 600,
 				})
 			} else {
+				if (this.isQuick) this.reset()
 				this.isQuick = false
-				if (!this.reset) {
-					const { width, height } = bounds
-					animejs({
-						targets: dot,
-						translateX: width / 2,
-						translateY: height / 2,
-						scale: 0,
-						duration: 2000,
-					})
-				}
 			}
+		},
+		reset() {
+			if (this.bounds === null) return
+
+			const { width, height } = this.bounds
+			animejs({
+				targets: this.$refs.dot,
+				translateX: width / 2,
+				translateY: height / 2,
+				scale: 0,
+				duration: 1000,
+			})
 		},
 		debounceEvent(e) {
 			return this.isQuick ? this.quickDebFunc(e) : this.slowDebFunc(e)
 		},
-		mounted() {
-			const buttons = document.querySelectorAll('button[data-gooey]')
-			const mouseDot = document.createElement('SPAN')
-			const margin = 50
-			const size = 100
-
-			const calcDistance = (mouse, bounds) => {
-				const { clientX: mX, clientY: mY } = mouse
-				const distanceXLeft = Math.min(
-					1,
-					(mX - (bounds.x - margin)) / (margin + bounds.width / 2),
-				)
-				const distanceXRight = Math.min(
-					1,
-					-(mX - (bounds.x + bounds.width + margin)) / (margin + bounds.width / 2),
-				)
-				const distanceYTop = Math.min(
-					1,
-					(mY - (bounds.y - margin)) / (margin + bounds.height / 2),
-				)
-				const distanceYBottom = Math.min(
-					1,
-					-(mY - (bounds.y + bounds.height + margin)) / (margin + bounds.height / 2),
-				)
-				return Math.min(distanceXLeft, distanceXRight, distanceYTop, distanceYBottom)
-			}
-
-			window.addEventListener('mousemove', e => {
-				const x = e.clientX
-				const y = e.clientY
-				let inside = buttons.length
-
-				buttons.forEach(button => {
-					const bounds = button.getBoundingClientRect()
-
-					if (
-						x > bounds.x - margin &&
-						x < bounds.x + bounds.width + margin &&
-						y > bounds.y - margin &&
-						y < bounds.y + bounds.height + margin
-					) {
-						inside++
-						const distance = calcDistance(e, bounds)
-						mouseDot.size = size * distance
-						mouseDot.style.width = `${size * distance}px`
-						mouseDot.style.height = `${size * distance}px`
-						mouseDot.style.background = window.getComputedStyle(button).backgroundColor
-					} else {
-						inside--
-					}
-				})
-
-				if (inside !== 0) {
-					mouseDot.style.visibility = 'visible'
-					mouseDot.style.left = `${x - mouseDot.size / 2}px`
-					mouseDot.style.top = `${y - mouseDot.size / 2}px`
-				} else {
-					mouseDot.style.visibility = 'hidden'
-				}
-			})
-		},
 	},
 	created() {
+		// Setting two different debounce functions:
 		this.slowDebFunc = debounce(this.handleMove, 400, {
 			maxWait: 400,
 			leading: true,
@@ -154,6 +99,12 @@ export default {
 			trailing: false,
 		})
 		this.debounceFunc = this.slowDebFunc
+	},
+	mounted() {
+		// Measuring Button size:
+		this.bounds = this.$refs.button.getBoundingClientRect()
+
+		this.reset()
 	},
 }
 </script>
@@ -171,7 +122,17 @@ export default {
 	border: none;
 	outline: none;
 	cursor: pointer;
+
+	transition: transform 0.1s $bouncy-easing;
 }
+.slot {
+	display: flex;
+	font-size: font-size(0);
+	font-family: 'Nunito', sans-serif;
+	font-weight: 800;
+	color: color.$bg;
+}
+
 .gooey-wrapper {
 	position: absolute;
 	z-index: -1;
@@ -187,9 +148,11 @@ export default {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: color.$main;
+	background: color.$pale;
+
+	transition: background 0.2s;
 }
-.mouseDot {
+.mouse-dot {
 	$size: ms(2);
 	display: block;
 	position: absolute;
@@ -198,8 +161,22 @@ export default {
 	width: $size;
 	height: $size;
 	border-radius: 50%;
-	background: color.$main;
-	opacity: 0.5;
-	transform: scale(0) translate($size, $size);
+	background: color.$pale;
+	opacity: 0.6;
+
+	transition: background 0.2s;
+}
+
+.gooey-button:hover {
+	.background {
+		background: color.$main;
+	}
+	.mouse-dot {
+		background: color.$main;
+	}
+}
+
+.gooey-button:active {
+	transform: scale(0.9);
 }
 </style>
