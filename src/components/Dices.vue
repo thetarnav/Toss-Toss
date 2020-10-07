@@ -1,31 +1,37 @@
 <template>
-	<div class="wrapper" :class="{ hidden: winner !== null }">
-		<transition-group name="selection" tag="div" class="selection">
-			<div
-				v-for="dice in dices"
-				:key="dice.id"
-				:class="{ selected: dice.isSelected || dice.isGone }"
-				class="selection-item"
-			></div>
-		</transition-group>
-		<transition-group appear name="dices" tag="div" class="dices">
-			<div
-				v-for="dice in dices"
-				:key="dice.id"
-				class="dice"
-				:data-nr="dice.nr"
-				@click="click(dice.id)"
-				:class="{ selected: dice.isSelected, disabled: dice.isDisabled, gone: dice.isGone }"
-			>
-				<ul class="dots">
-					<li v-for="(dot, index) in 9" :key="index" class="dot active"></li>
-				</ul>
-				<ul class="dots">
-					<li v-for="(dot, index) in 9" :key="index" class="dot inactive"></li>
-				</ul>
-			</div>
-		</transition-group>
-	</div>
+	<transition appear name="wrapper" :duration="400">
+		<div class="wrapper" :class="{ hidden: winner !== null }">
+			<transition-group name="selection" tag="div" class="selection">
+				<div
+					v-for="dice in dices"
+					:key="dice.id"
+					:class="{ selected: dice.isSelected || dice.isGone }"
+					class="selection-item"
+				></div>
+			</transition-group>
+			<transition-group appear name="dices" tag="div" class="dices">
+				<div
+					v-for="dice in dices"
+					:key="dice.id"
+					class="dice"
+					:data-nr="dice.nr"
+					@click="click(dice.id)"
+					:class="{
+						selected: dice.isSelected,
+						disabled: dice.isDisabled,
+						gone: dice.isGone,
+					}"
+				>
+					<ul class="dots">
+						<li v-for="(dot, index) in 9" :key="index" class="dot active"></li>
+					</ul>
+					<ul class="dots">
+						<li v-for="(dot, index) in 9" :key="index" class="dot inactive"></li>
+					</ul>
+				</div>
+			</transition-group>
+		</div>
+	</transition>
 </template>
 
 <script>
@@ -55,17 +61,30 @@ $margin: $size / 1.618;
 $dot-size: $size / 1.618 / 1.618 / 1.618;
 $padding: 0;
 
-.wrapper {
-	position: relative;
-	&.hidden {
-		.dice {
-			pointer-events: none;
-			.dot {
-				transform: scale(0) !important;
-			}
+.outer-wrapper {
+	width: $size * 3 + $margin * 3;
+}
+
+@mixin hidden-board {
+	.dice {
+		pointer-events: none;
+		.dot {
+			transform: scale(0) !important;
 		}
 	}
 }
+
+.wrapper {
+	position: relative;
+	&.hidden {
+		@include hidden-board;
+	}
+}
+.wrapper-enter-from,
+.wrapper-leave-to {
+	@include hidden-board;
+}
+
 .dices {
 	position: relative;
 	display: flex;

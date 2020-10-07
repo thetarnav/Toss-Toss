@@ -69,7 +69,7 @@
 				</g>
 			</svg>
 		</button>
-		<Dices class="dices-wrapper" />
+		<Dices />
 		<button class="btn keep" @click="keep" :disabled="buttonsDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<g class="nc-icon-wrapper" fill="#000000">
@@ -88,8 +88,8 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
 
-import Dices from '@/components/Dices'
 import Player from '@/components/Player'
+import Dices from '@/components/Dices'
 
 export default {
 	name: 'App',
@@ -101,11 +101,7 @@ export default {
 		return {}
 	},
 	computed: {
-		...mapState('game', {
-			activePlayer: state => state.activePlayer,
-			totalScore: state => state.totalScore,
-			rollDisabled: state => state.rollDisabled,
-		}),
+		...mapState('game', ['activePlayer', 'totalScore', 'rollDisabled', 'winner']),
 		...mapGetters('game', ['buttonsDisabled']),
 	},
 	methods: {
@@ -123,6 +119,20 @@ export default {
 @use 'scss/library/colors' as color;
 @use 'scss/library/variables' as *;
 @use 'scss/library/ms' as *;
+
+.yoo-enter-active {
+	transition: all 0.3s ease-out;
+}
+
+.yoo-leave-active {
+	transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.yoo-enter-from,
+.yoo-leave-to {
+	transform: translateX(20px);
+	opacity: 0;
+}
 
 .board {
 	display: flex;
