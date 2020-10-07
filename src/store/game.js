@@ -85,7 +85,7 @@ export default {
 			} else {
 				commit('updateTotalScore')
 
-				if (state.totalScore[state.activePlayer] >= 500) {
+				if (state.totalScore[state.activePlayer] >= 2000) {
 					state.dices = state.dices.map(die => ({
 						...die,
 						isSelected: false,
