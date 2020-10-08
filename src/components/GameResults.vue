@@ -29,6 +29,7 @@
 			<GooeyButton class="re-match" @click="rematch">
 				Play Again
 			</GooeyButton>
+			<Fireworks v-if="winner === 0" />
 			<div class="cover"></div>
 		</div>
 	</transition>
@@ -37,10 +38,11 @@
 <script>
 import { mapState } from 'vuex'
 import GooeyButton from './GooeyButton'
+import Fireworks from './Fireworks'
 
 export default {
 	name: 'GameResults',
-	components: { GooeyButton },
+	components: { GooeyButton, Fireworks },
 	computed: {
 		...mapState('game', ['winner']),
 	},
