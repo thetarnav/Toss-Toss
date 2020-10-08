@@ -34,3 +34,9 @@ body {
 	flex-direction: column;
 	padding: gs(1);
 }
+
+.svg-filter {
+	position: absolute;
+	visibility: hidden;
+	pointer-events: none;
+}

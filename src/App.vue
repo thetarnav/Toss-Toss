@@ -1,5 +1,5 @@
 <template>
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter">
 		<defs>
 			<filter id="goo-xl">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
@@ -13,7 +13,7 @@
 			</filter>
 		</defs>
 	</svg>
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter">
 		<defs>
 			<filter id="goo-l">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
@@ -27,7 +27,7 @@
 			</filter>
 		</defs>
 	</svg>
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter">
 		<defs>
 			<filter id="goo-m">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
@@ -41,7 +41,7 @@
 			</filter>
 		</defs>
 	</svg>
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter">
 		<defs>
 			<filter id="goo-s">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur" />
@@ -55,7 +55,7 @@
 			</filter>
 		</defs>
 	</svg>
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter">
 		<defs>
 			<filter id="button-goo">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
