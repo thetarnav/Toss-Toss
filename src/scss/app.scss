@@ -1,8 +1,8 @@
 @use 'base';
-
-@use 'library/colors' as color;
 @use 'library/variables' as *;
 @use 'library/ms' as *;
+@use 'library/colors' as color;
+@use 'library/mixins' as *;
 
 *::selection {
 	background: color.$pale;
@@ -39,4 +39,17 @@ body {
 	position: absolute;
 	visibility: hidden;
 	pointer-events: none;
+}
+
+h6 {
+	@include h6;
+}
+h5 {
+	@include h5;
+}
+h3 {
+	@include uppercase-subheading;
+}
+h2 {
+	@include bold-heading;
 }

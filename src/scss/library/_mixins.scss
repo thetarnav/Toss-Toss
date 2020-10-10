@@ -16,13 +16,19 @@
 	letter-spacing: -0.02em;
 }
 
-@mixin small-caption {
-	font-family: 'Averia Sans Libre', cursive;
+@mixin h5 {
+	font-family: 'Averia Sans Libre', 'Nunito', cursive;
 	font-size: font-size(1);
 	line-height: gs(1.5);
 	margin-bottom: ms(-3);
 	font-weight: 400;
 	letter-spacing: -0.04em;
+}
+
+@mixin h6 {
+	font-family: 'Averia Sans Libre', 'Nunito', cursive;
+	font-weight: 700;
+	font-size: font-size(0);
 }
 
 @mixin pill-background($color: color.$pale, $hidden: false) {

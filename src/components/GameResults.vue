@@ -19,16 +19,16 @@
 						Player 2
 					</span>
 				</h3>
-				<h6>won the game!</h6>
+				<h5>6won the game!</h5>
 			</div>
 			<div class="you-won" v-if="winner === 0">
 				<h2>
 					You Win!
 				</h2>
 			</div>
-			<GooeyButton class="re-match" @click="rematch">
+			<gooey-button class="re-match" @click="rematch">
 				Play Again
-			</GooeyButton>
+			</gooey-button>
 			<Fireworks v-if="winner === 0" />
 			<div class="cover"></div>
 		</div>
@@ -37,12 +37,12 @@
 
 <script>
 import { mapState } from 'vuex'
-import GooeyButton from './GooeyButton'
+// import GooeyButton from './GooeyButton'
 import Fireworks from './Fireworks'
 
 export default {
 	name: 'GameResults',
-	components: { GooeyButton, Fireworks },
+	components: { Fireworks },
 	computed: {
 		...mapState('game', ['winner']),
 	},
@@ -55,10 +55,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss/library/colors' as color;
 @use '../scss/library/variables' as *;
-@use '../scss/library/mixins' as *;
 @use '../scss/library/ms' as *;
+@use '../scss/library/colors' as color;
+@use '../scss/library/mixins' as *;
 
 .game-results {
 	z-index: 1000;
@@ -77,8 +77,7 @@ export default {
 		fill: color.$main;
 	}
 }
-h6 {
-	@include small-caption;
+h5 {
 	color: color.$main;
 	text-align: center;
 }

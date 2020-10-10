@@ -35,7 +35,7 @@ const calcDistance = (mouse, bounds) => {
 }
 
 export default {
-	name: 'GooeyButton',
+	name: 'gooey-button',
 	components: { GlobalEvents },
 	data() {
 		return { isQuick: false, bounds: null }
@@ -110,10 +110,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss/library/colors' as color;
-@use '../scss/library/variables' as *;
-@use '../scss/library/mixins' as *;
-@use '../scss/library/ms' as *;
+@use '../../scss/library/variables' as *;
+@use '../../scss/library/ms' as *;
+@use '../../scss/library/colors' as color;
+@use '../../scss/library/mixins' as *;
 
 .gooey-button {
 	position: relative;

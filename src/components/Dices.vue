@@ -52,9 +52,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss/library/colors' as color;
 @use '../scss/library/variables' as *;
 @use '../scss/library/ms' as *;
+@use '../scss/library/colors' as color;
+@use '../scss/library/mixins' as *;
 
 $size: $dice-size;
 $margin: $dice-margin;
