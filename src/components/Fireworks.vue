@@ -32,9 +32,9 @@ export default {
 		}
 
 		function setParticuleDirection(p) {
-			var angle = (anime.random(0, 360) * Math.PI) / 180
-			var value = anime.random(50, 180)
-			var radius = [-1, 1][anime.random(0, 1)] * value
+			const angle = (anime.random(0, 360) * Math.PI) / 180
+			const value = anime.random(50, 180)
+			const radius = [-1, 1][anime.random(0, 1)] * value
 			return {
 				x: p.x + radius * Math.cos(angle),
 				y: p.y + radius * Math.sin(angle),
@@ -42,7 +42,7 @@ export default {
 		}
 
 		function createParticule(x, y) {
-			var p = {}
+			const p = {}
 			p.x = x
 			p.y = y
 			p.color = colors[anime.random(0, colors.length - 1)]
@@ -58,7 +58,7 @@ export default {
 		}
 
 		function createCircle(x, y) {
-			var p = {}
+			const p = {}
 			p.x = x
 			p.y = y
 			p.color = '#FFF'
@@ -78,15 +78,15 @@ export default {
 		}
 
 		function renderParticule(anim) {
-			for (var i = 0; i < anim.animatables.length; i++) {
+			for (let i = 0; i < anim.animatables.length; i++) {
 				anim.animatables[i].target.draw()
 			}
 		}
 
 		function animateParticules(x, y) {
-			var circle = createCircle(x, y)
-			var particules = []
-			for (var i = 0; i < numberOfParticles; i++) {
+			const circle = createCircle(x, y)
+			const particules = []
+			for (let i = 0; i < numberOfParticles; i++) {
 				particules.push(createParticule(x, y))
 			}
 			anime
