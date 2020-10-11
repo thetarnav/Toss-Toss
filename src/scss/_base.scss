@@ -6,11 +6,10 @@ body {
 body {
 	margin: 0;
 	@supports not (font-variant-ligatures: common-ligatures) {
-		font-feature-settings: 'liga' 1, 'onum' 1;
+		font-feature-settings: 'liga' 1;
 	}
 	@supports (font-variant-ligatures: common-ligatures) {
 		font-variant-ligatures: common-ligatures;
-		font-variant-numeric: oldstyle-nums;
 	}
 
 	@supports (kerning: normal) {

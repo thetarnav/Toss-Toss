@@ -48,6 +48,7 @@ export default {
 		initGame({ state, dispatch }) {
 			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
 			state.totalScore = [0, 0]
+
 			dispatch('initRound')
 		},
 		initRound({ state, dispatch }) {

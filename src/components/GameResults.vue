@@ -19,16 +19,21 @@
 						Player 2
 					</span>
 				</h3>
-				<h5>6won the game!</h5>
+				<h5>won the game!</h5>
 			</div>
 			<div class="you-won" v-if="winner === 0">
 				<h2>
 					You Win!
 				</h2>
 			</div>
-			<gooey-button class="re-match" @click="rematch">
-				Play Again
-			</gooey-button>
+			<nav class="buttons">
+				<gooey-button class="quit" @click="quit">
+					Quit
+				</gooey-button>
+				<gooey-button class="re-match" @click="rematch">
+					Play Again
+				</gooey-button>
+			</nav>
 			<Fireworks v-if="winner === 0" />
 			<div class="cover"></div>
 		</div>
@@ -49,6 +54,9 @@ export default {
 	methods: {
 		rematch() {
 			this.$store.dispatch('game/initGame')
+		},
+		quit() {
+			this.$router.push({ name: 'Lobby' })
 		},
 	},
 }
@@ -93,8 +101,13 @@ h2 {
 	color: color.$main;
 }
 
-.re-match {
+.buttons {
 	margin-top: gs(0.5);
+	display: flex;
+	justify-content: center;
+	> * {
+		margin: 0 gs(0.5);
+	}
 }
 
 .cover {

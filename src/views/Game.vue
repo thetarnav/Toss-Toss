@@ -55,7 +55,7 @@ export default {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
 	},
 	mounted() {
-		this.$store.dispatch('game/initRound')
+		this.$store.dispatch('game/initGame')
 	},
 }
 </script>

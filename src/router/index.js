@@ -4,13 +4,13 @@ import Lobby from '../views/Lobby.vue'
 
 const routes = [
 	{
-		path: '/',
+		path: '/:menuState?',
 		name: 'Lobby',
 		component: Lobby,
 		props: true,
 	},
 	{
-		path: '/game/:gameID',
+		path: '/game/:gameID?',
 		name: 'Game',
 		component: () => import('../views/Game.vue'),
 	},
