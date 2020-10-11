@@ -22,39 +22,31 @@
 
 			<div key="game-select" class="game-select" v-else-if="menuState === 'game-select'">
 				<gooey-button @click="playHotSeat">
-					Hot-seat
+					Hot seat
 				</gooey-button>
 				<gooey-button @click="setMenuState('online-play')">
 					Online
 				</gooey-button>
 			</div>
 
-			<div key="online-play" class="online-play" v-else-if="menuState === 'online-play'">
-				<text-input
-					name="name"
-					class="name-input"
-					v-model.trim="name"
-					placeholder="Your name"
-					autocomplete="off"
-				>
-					Who are You?
-				</text-input>
-				<gooey-button :disabled="name === ''">
-					copy invite
-				</gooey-button>
-			</div>
+			<menu-online
+				key="online-play"
+				class="online-play"
+				v-else-if="menuState === 'online-play'"
+			></menu-online>
 		</transition>
 	</div>
 </template>
 
 <script>
+import menuOnline from '../components/menu-online'
+
 export default {
 	name: 'Lobby',
+	components: { menuOnline },
 	props: ['inviteID'],
 	data() {
-		return {
-			name: '',
-		}
+		return {}
 	},
 	computed: {
 		menuState() {
@@ -125,22 +117,10 @@ export default {
 	justify-content: center;
 }
 
-.name-input {
-	width: ms(4);
-}
 .game-select {
 	display: flex;
 	> * {
 		margin: 0 gs(0.5);
-	}
-}
-
-.online-play {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	> * {
-		margin: gs(0.5) 0;
 	}
 }
 

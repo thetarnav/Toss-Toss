@@ -7,14 +7,19 @@ export default createStore({
 		game,
 	},
 	state: {
-		playerOne: {
-			name: 'Player 1',
+		online: false,
+		playerNames: ['Player 1', 'Player 2'],
+	},
+	mutations: {
+		resetPlayerNames: state => (state.playerNames = ['Player 1', 'Player 2']),
+	},
+	actions: {
+		startHotSeatSession({ commit }) {
+			commit('resetPlayerNames')
 		},
-		playerTwo: {
-			name: 'Player 2',
-		},
+		startOnlineSession() {},
 	},
 	getters: {
-		playerData: state => n => (n === 0 ? state.playerOne : state.playerTwo),
+		playerName: state => n => state.playerNames[n],
 	},
 })
