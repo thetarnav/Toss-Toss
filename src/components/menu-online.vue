@@ -9,7 +9,7 @@
 		>
 			Who are You?
 		</text-input>
-		<gooey-button :disabled="name === ''">
+		<gooey-button :disabled="name === ''" @click="submit">
 			<transition name="button-content">
 				<span>copy invite</span>
 			</transition>
@@ -29,9 +29,17 @@ export default {
 		generateName() {
 			this.name = goby.generate(['pre', 'suf'])
 		},
+		submit() {
+			this.$store.dispatch('startOnlineSession')
+		},
 	},
 	mounted() {
 		this.generateName()
+	},
+	watch: {
+		name() {
+			this.$store.commit('changeName', this.name)
+		},
 	},
 }
 </script>
