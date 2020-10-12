@@ -49,16 +49,14 @@ export default {
 	},
 	computed: {
 		...mapState('game', ['activePlayer', 'totalScore', 'rollDisabled', 'winner']),
-		...mapState(['online']),
+		...mapState(['isSessionOnline']),
 		...mapGetters('game', ['buttonsDisabled']),
 	},
 	methods: {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
 	},
 	mounted() {
-		this.online
-			? this.$store.dispatch('startHotSeatSession')
-			: this.$store.dispatch('startOnlineSession')
+		!this.isSessionOnline && this.$store.dispatch('startHotSeatSession')
 
 		this.$store.dispatch('game/initGame')
 	},

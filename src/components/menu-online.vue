@@ -38,7 +38,7 @@ export default {
 	},
 	watch: {
 		name() {
-			this.$store.commit('changeName', this.name)
+			this.$store.dispatch('changeName', this.name)
 		},
 	},
 }
