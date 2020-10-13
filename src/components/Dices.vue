@@ -18,7 +18,7 @@
 					@click="click(dice.id)"
 					:class="{
 						selected: dice.isSelected,
-						disabled: dice.isDisabled,
+						disabled: dice.isDisabled || notActive,
 						gone: dice.isGone,
 					}"
 				>
@@ -39,6 +39,12 @@ import { mapActions, mapState } from 'vuex'
 
 export default {
 	name: 'Dices',
+	props: {
+		notActive: {
+			type: Boolean,
+			default: false,
+		},
+	},
 	data() {
 		return {}
 	},
@@ -46,7 +52,10 @@ export default {
 		...mapState('game', ['dices', 'winner']),
 	},
 	methods: {
-		...mapActions({ click: 'game/select' }),
+		...mapActions({ select: 'game/select' }),
+		click(id) {
+			if (!this.notActive) this.select(id)
+		},
 	},
 }
 </script>

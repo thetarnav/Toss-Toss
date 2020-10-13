@@ -55,7 +55,6 @@ export default {
 			state.currentScore = score
 		},
 		resetRound(state) {
-			console.log(state.init)
 			state.lost = false
 			state.dices = []
 

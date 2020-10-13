@@ -108,7 +108,7 @@ export default createStore({
 					opponentJoined: true,
 					timestamp: Date.now(),
 				})
-				.then(monka => {
+				.then(() => {
 					// You (Oponent) successfully joined session
 					state.session.id = inviteID
 					state.session.state = 'joined'
@@ -126,11 +126,7 @@ export default createStore({
 				.collection('sessions')
 				.doc(state.session.id)
 				.onSnapshot(doc => {
-					if (doc.metadata.hasPendingWrites) return
-
 					const data = doc.data()
-					commit('game/updateLocalData', data.gameData)
-
 					if (getters.isHost) {
 						!getters.playerName(1) && commit('changeName', [1, data.playerTwo])
 
@@ -149,6 +145,10 @@ export default createStore({
 							if (data.opponentJoined === true) state.session.state = 'joined'
 						}
 					} else !getters.playerName(0) && commit('changeName', [0, data.playerOne])
+
+					if (!doc.metadata.hasPendingWrites) {
+						commit('game/updateLocalData', data.gameData)
+					}
 				})
 		},
 		enterOnlineGame({ state, getters }) {
@@ -156,6 +156,7 @@ export default createStore({
 				.collection('sessions')
 				.doc(state.session.id)
 				.update({
+					playerTwo: getters.playerName(1),
 					playing: true,
 					timestamp: Date.now(),
 				})

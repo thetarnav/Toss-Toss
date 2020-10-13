@@ -90,7 +90,7 @@ export default {
 	position: relative;
 
 	.text {
-		@include uppercase-subheading;
+		@include subheading;
 	}
 	@include pill-background($hidden: true);
 }

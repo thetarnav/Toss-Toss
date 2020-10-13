@@ -13,18 +13,18 @@
 					<polygon points="24,5.3 22.5,19.1 1.3,19.1 0,5.3 6.7,7.5 11.9,0.9 17.2,7.5 " />
 				</svg>
 			</span>
-			<div class="opponent-won" v-if="winner === 1">
+			<div class="you-won" v-if="winner === playerIndex">
+				<h2>
+					You Win!
+				</h2>
+			</div>
+			<div class="opponent-won" v-else>
 				<h3>
 					<span>
 						Player 2
 					</span>
 				</h3>
 				<h5>won the game!</h5>
-			</div>
-			<div class="you-won" v-if="winner === 0">
-				<h2>
-					You Win!
-				</h2>
 			</div>
 			<nav class="buttons">
 				<gooey-button class="quit" @click="quit">
@@ -34,7 +34,7 @@
 					Play Again
 				</gooey-button>
 			</nav>
-			<Fireworks v-if="winner === 0" />
+			<Fireworks v-if="winner === playerIndex" />
 			<div class="cover"></div>
 		</div>
 	</transition>
@@ -48,6 +48,7 @@ import Fireworks from './Fireworks'
 export default {
 	name: 'GameResults',
 	components: { Fireworks },
+	props: ['playerIndex'],
 	computed: {
 		...mapState('game', ['winner']),
 	},
@@ -92,7 +93,7 @@ h5 {
 h3 {
 	text-align: center;
 	span {
-		@include uppercase-subheading;
+		@include subheading;
 	}
 	height: gs(1);
 }

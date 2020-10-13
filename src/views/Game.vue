@@ -1,8 +1,12 @@
 <template>
-	<Player :playerIndex="1" align="right" />
+	<Player :playerIndex="playerIndex ? 0 : 1" align="right" />
 
 	<main class="board">
-		<button class="btn roll" @click="roll" :disabled="buttonsDisabled || rollDisabled">
+		<button
+			class="btn roll"
+			@click="roll"
+			:disabled="notActive || buttonsDisabled || rollDisabled"
+		>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<title>ic24-rotate</title>
 				<g fill="#000000">
@@ -13,8 +17,8 @@
 				</g>
 			</svg>
 		</button>
-		<Dices class="dices-wrapper" />
-		<button class="btn keep" @click="keep" :disabled="buttonsDisabled">
+		<Dices class="dices-wrapper" :notActive="notActive" />
+		<button class="btn keep" @click="keep" :disabled="notActive || buttonsDisabled">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<g class="nc-icon-wrapper" fill="#000000">
 					<path
@@ -24,10 +28,10 @@
 				</g>
 			</svg>
 		</button>
-		<GameResults class="game-results" v-if="winner !== null" />
+		<GameResults class="game-results" v-if="winner !== null" :playerIndex="playerIndex" />
 	</main>
 
-	<Player :playerIndex="0" align="left" />
+	<Player :playerIndex="playerIndex" align="left" />
 </template>
 
 <script>
@@ -51,6 +55,13 @@ export default {
 		...mapState('game', ['activePlayer', 'totalScore', 'rollDisabled', 'winner']),
 		...mapState(['online']),
 		...mapGetters('game', ['buttonsDisabled']),
+		...mapGetters(['isHost']),
+		notActive() {
+			return this.activePlayer !== this.playerIndex
+		},
+		playerIndex() {
+			return this.isHost ? 0 : 1
+		},
 	},
 	methods: {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
@@ -58,7 +69,6 @@ export default {
 	mounted() {
 		this.$store.subscribe(({ type }) => {
 			const [module, commit] = type.split('/')
-			console.log(commit)
 			if (
 				this.online &&
 				module === 'game' &&
@@ -68,8 +78,7 @@ export default {
 					'updateRoundScore',
 					'setWinner',
 					'setCurrentScore',
-				].includes(commit) &&
-				commit !== 'updateLocalData'
+				].includes(commit)
 			) {
 				this.$store.dispatch('updateServerData')
 			}

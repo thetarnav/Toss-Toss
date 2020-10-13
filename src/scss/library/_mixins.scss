@@ -2,9 +2,9 @@
 @use './colors' as color;
 @use './variables' as *;
 
-@mixin uppercase-subheading {
+@mixin subheading {
 	font-size: font-size(1);
-	text-transform: uppercase;
+	// text-transform: uppercase;
 	letter-spacing: 0.05em;
 	filter: url(#goo-s);
 }
