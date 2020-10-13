@@ -16,11 +16,13 @@
 	</transition>
 	<div class="lobby">
 		<transition appear name="menu" mode="out-in">
-			<gooey-button key="play" v-if="menuState === 'init'" @click="setMenuState('game-select')">
+			<menu-online class="online-joined" v-if="inviteID !== undefined"></menu-online>
+
+			<gooey-button v-else-if="menuState === 'init'" @click="setMenuState('game-select')">
 				Play!
 			</gooey-button>
 
-			<div key="game-select" class="game-select" v-else-if="menuState === 'game-select'">
+			<div class="game-select" v-else-if="menuState === 'game-select'">
 				<gooey-button @click="playHotSeat">
 					Hot seat
 				</gooey-button>
@@ -29,11 +31,7 @@
 				</gooey-button>
 			</div>
 
-			<menu-online
-				key="online-play"
-				class="online-play"
-				v-else-if="menuState === 'online-play'"
-			></menu-online>
+			<menu-online class="online-play" v-else-if="menuState === 'online-play'"></menu-online>
 		</transition>
 	</div>
 </template>
@@ -61,8 +59,11 @@ export default {
 			this.$router.go(-1)
 		},
 		playHotSeat() {
-			this.$router.push({ name: 'Game' })
+			this.$store.dispatch('startHotSeatSession')
 		},
+	},
+	created() {
+		this.inviteID !== undefined && this.$store.dispatch('joinOnlineSession', this.inviteID)
 	},
 }
 </script>

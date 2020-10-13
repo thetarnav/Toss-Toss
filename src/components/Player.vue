@@ -46,7 +46,7 @@ export default {
 		...mapState('game', ['lost']),
 		playerName() {
 			if (typeof this.playerIndex !== 'number') return
-			return this.$store.getters.playerName(this.playerIndex)
+			return this.$store.getters.playerName(this.playerIndex) || `PLAYER ${this.playerIndex + 1}`
 		},
 		total() {
 			return this.$store.state.game.totalScore[this.playerIndex]

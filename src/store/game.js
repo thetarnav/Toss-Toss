@@ -1,6 +1,7 @@
 import { random } from '@/js/utilities'
 
 const initialState = {
+	init: false,
 	dices: [],
 	nDices: 6,
 	activePlayer: 0,
@@ -43,15 +44,18 @@ export default {
 			player = player || (state.activePlayer === 0 ? 1 : 0)
 			state.activePlayer = player
 		},
-	},
-	actions: {
-		initGame({ state, dispatch }) {
-			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
-			state.totalScore = [0, 0]
-
-			dispatch('initRound')
+		updateLocalData(state, data) {
+			Object.keys(data).forEach(key => (state[key] = data[key]))
 		},
-		initRound({ state, dispatch }) {
+		selectDice(state, payload) {
+			const [n, selected] = payload
+			state.dices[n].isSelected = selected
+		},
+		setCurrentScore(state, score) {
+			state.currentScore = score
+		},
+		resetRound(state) {
+			console.log(state.init)
 			state.lost = false
 			state.dices = []
 
@@ -65,18 +69,28 @@ export default {
 					isDisabled: false,
 				})
 			}
-
+		},
+		setWinner(state, n = null) {
+			state.winner = n
+		},
+	},
+	actions: {
+		initGame({ state, dispatch, commit }) {
+			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
+			state.totalScore = [0, 0]
+			commit('resetRound')
+			state.init = true
+			while (countPoints(state.dices) === 0) {}
 			dispatch('checkRoundOver')
 		},
 		roll({ commit, dispatch }) {
 			commit('roll')
-
 			commit('updateRoundScore')
-
 			dispatch('checkRoundOver')
 		},
 		endRound({ state, commit, getters, dispatch }, lost = false) {
 			if (lost === true) {
+				// LOST:
 				state.lost = true
 				state.dices = state.dices.map(die => ({ ...die, isDisabled: true }))
 				setTimeout(() => {
@@ -84,6 +98,7 @@ export default {
 					restart()
 				}, 1500)
 			} else {
+				// KEEP:
 				commit('updateTotalScore')
 
 				if (state.totalScore[state.activePlayer] >= 2000) {
@@ -92,7 +107,7 @@ export default {
 						isSelected: false,
 						isGone: false,
 					}))
-					state.winner = state.activePlayer
+					commit('setWinner', state.activePlayer)
 					return
 				}
 
@@ -101,7 +116,8 @@ export default {
 
 			function restart() {
 				commit('playerSwitch')
-				dispatch('initRound')
+				commit('resetRound')
+				dispatch('checkRoundOver')
 			}
 		},
 		checkRoundOver({ state, commit, getters, dispatch }) {
@@ -117,16 +133,16 @@ export default {
 			if (dice.isDisabled || dice.isGone) return
 
 			// No dice is selected:
-			if (selected.length === 0) dice.isSelected = true
+			if (selected.length === 0) commit('selectDice', [id, true])
 			// Clicked dice is not selected:
 			else if (chain === undefined || parseInt(chain) === dice.nr)
-				dice.isSelected = !dice.isSelected
+				commit('selectDice', [id, !dice.isSelected])
 			else return
 
 			// Disabling dices:
 			dispatch('disable')
 
-			state.currentScore = countPoints(getters.selected)
+			commit('setCurrentScore', countPoints(getters.selected))
 		},
 		disable({ state, getters }) {
 			const { selected, gone } = getters,

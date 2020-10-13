@@ -49,16 +49,31 @@ export default {
 	},
 	computed: {
 		...mapState('game', ['activePlayer', 'totalScore', 'rollDisabled', 'winner']),
-		...mapState(['isSessionOnline']),
+		...mapState(['online']),
 		...mapGetters('game', ['buttonsDisabled']),
 	},
 	methods: {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
 	},
 	mounted() {
-		!this.isSessionOnline && this.$store.dispatch('startHotSeatSession')
-
-		this.$store.dispatch('game/initGame')
+		this.$store.subscribe(({ type }) => {
+			const [module, commit] = type.split('/')
+			console.log(commit)
+			if (
+				this.online &&
+				module === 'game' &&
+				[
+					'resetRound',
+					'updateTotalScore',
+					'updateRoundScore',
+					'setWinner',
+					'setCurrentScore',
+				].includes(commit) &&
+				commit !== 'updateLocalData'
+			) {
+				this.$store.dispatch('updateServerData')
+			}
+		})
 	},
 }
 </script>

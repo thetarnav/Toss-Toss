@@ -11,13 +11,17 @@
 		</text-input>
 		<gooey-button :disabled="name === ''" @click="submit">
 			<transition name="button-content">
-				<span>copy invite</span>
+				<span v-if="!isHost">Play!</span>
+				<span v-else-if="sessionState === 'offline'">copy invite</span>
+				<span v-else-if="sessionState === 'loading'">loading</span>
+				<span v-else>copied</span>
 			</transition>
 		</gooey-button>
 	</div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 const goby = require('goby').init()
 
 export default {
@@ -25,12 +29,14 @@ export default {
 	data() {
 		return { name: '' }
 	},
+	computed: { ...mapGetters(['sessionState', 'isHost']) },
 	methods: {
 		generateName() {
 			this.name = goby.generate(['pre', 'suf'])
 		},
 		submit() {
-			this.$store.dispatch('startOnlineSession')
+			if (this.isHost) this.$store.dispatch('startOnlineSession')
+			else this.$store.dispatch('enterOnlineGame')
 		},
 	},
 	mounted() {
