@@ -74,12 +74,20 @@ export default {
 		},
 	},
 	actions: {
-		initGame({ state, dispatch, commit }) {
+		initGame({ state, dispatch, commit, rootState }) {
 			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
 			state.totalScore = [0, 0]
-			commit('resetRound')
 			state.init = true
-			while (countPoints(state.dices) === 0) {}
+			commit('resetRound')
+
+			if (rootState.online) {
+				while (countPoints(state.dices) === 0) {
+					commit('resetRound')
+					if (countPoints(state.dices) > 0) break
+				}
+				Math.random() >= 0.5 && commit('playerSwitch')
+			}
+
 			dispatch('checkRoundOver')
 		},
 		roll({ commit, dispatch }) {

@@ -52,7 +52,7 @@ export default {
 		return {}
 	},
 	computed: {
-		...mapState('game', ['activePlayer', 'totalScore', 'rollDisabled', 'winner']),
+		...mapState('game', ['activePlayer', 'totalScore', 'rollDisabled', 'winner', 'init']),
 		...mapState(['online']),
 		...mapGetters('game', ['buttonsDisabled']),
 		...mapGetters(['isHost']),
@@ -68,6 +68,14 @@ export default {
 		...mapActions('game', { roll: 'roll', keep: 'endRound' }),
 	},
 	mounted() {
+		/**
+			Start Hot seat game when not-init & not-online
+		*/
+		if (!this.online && !this.init) this.$store.dispatch('startHotSeatSession')
+
+		/**
+			Trigger Firestore Update on game dama mutations:
+		*/
 		this.$store.subscribe(({ type }) => {
 			const [module, commit] = type.split('/')
 			if (
