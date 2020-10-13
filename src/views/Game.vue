@@ -57,6 +57,7 @@ export default {
 		...mapGetters('game', ['buttonsDisabled']),
 		...mapGetters(['isHost']),
 		notActive() {
+			if (!this.online) return false
 			return this.activePlayer !== this.playerIndex
 		},
 		playerIndex() {
