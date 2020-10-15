@@ -65,6 +65,11 @@ export default {
 	created() {
 		this.inviteID !== undefined && this.$store.dispatch('joinOnlineSession', this.inviteID)
 	},
+	beforeRouteLeave(to, from, next) {
+		console.log('left:', from)
+		if (!this.$store.state.online || to.name === 'Game') next()
+		else this.$store.dispatch('leaveOnlineSession').then(() => next())
+	},
 }
 </script>
 

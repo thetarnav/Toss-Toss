@@ -2,41 +2,45 @@ import { firestore } from '@/firebase'
 import { createStore } from 'vuex'
 import router from '@/router'
 import debounce from 'lodash.debounce'
+import cloneDeep from 'lodash.clonedeep'
 import copyToClipboard from 'copy-to-clipboard'
 
 import game from './game'
 
+const collRef = firestore.collection('sessions')
+
 const changeNameFirestore = debounce((n, name, sessionID) => {
 	const player = n === 0 ? 'playerOne' : 'playerTwo'
-	firestore
-		.collection('sessions')
-		.doc(sessionID)
-		.update({
-			[player]: name,
-			timestamp: Date.now(),
-		})
+	collRef.doc(sessionID).update({
+		[player]: name,
+		timestamp: Date.now(),
+	})
 }, 2000)
+
+const initialState = {
+	playerNames: [null, null],
+	online: false,
+	/* false -> offlinePlay or session wasn't initiated
+			true -> request for session creation has beed sent to firestore
+		*/
+	session: {
+		opponentJoined: false,
+		host: true,
+		id: undefined,
+		/* undefined when the session document on firestore:
+			isn't created or wasn't sent to the app
+			*/
+		state: 'offline',
+		inviteLink: null,
+	},
+}
 
 export default createStore({
 	modules: {
 		game,
 	},
 	state: {
-		playerNames: [null, null],
-		online: false,
-		/* false -> offlinePlay or session wasn't initiated
-			true -> request for session creation has beed sent to firestore
-		*/
-		session: {
-			opponentJoined: false,
-			host: true,
-			id: undefined,
-			/* undefined when the session document on firestore:
-			isn't created or wasn't sent to the app
-			*/
-			state: 'offline',
-			inviteLink: null,
-		},
+		...cloneDeep(initialState),
 	},
 	mutations: {
 		resetPlayerNames(state) {
@@ -69,8 +73,7 @@ export default createStore({
 				state.session.state = 'loading'
 				dispatch('game/initGame')
 
-				firestore
-					.collection('sessions')
+				collRef
 					.add({
 						gameData: { ...state.game },
 						playerOne: getters.playerName(0),
@@ -104,8 +107,7 @@ export default createStore({
 			state.session.host = false
 			state.online = true
 
-			firestore
-				.collection('sessions')
+			collRef
 				.doc(inviteID)
 				.update({
 					playerTwo: getters.playerName(1),
@@ -125,39 +127,40 @@ export default createStore({
 					state.online = false
 				})
 		},
-		listenServerChanges({ state, commit, getters }) {
-			firestore
-				.collection('sessions')
-				.doc(state.session.id)
-				.onSnapshot(doc => {
-					const data = doc.data()
-					if (getters.isHost) {
-						!getters.playerName(1) && commit('changeName', [1, data.playerTwo])
+		listenServerChanges({ state, commit, getters, dispatch }) {
+			collRef.doc(state.session.id).onSnapshot(doc => {
+				console.log(doc.exists)
+				if (!doc.exists) {
+					if (state.online) dispatch('leaveOnlineSession', true)
+					return
+				}
+				const data = doc.data()
+				if (getters.isHost) {
+					!getters.playerName(1) && commit('changeName', [1, data.playerTwo])
 
-						if (getters.sessionState !== 'playing') {
-							// change opponent name:
-							commit('changeName', [1, data.playerTwo])
+					if (getters.sessionState !== 'playing') {
+						// change opponent name:
+						commit('changeName', [1, data.playerTwo])
 
-							// ENTER THE GAME
-							if (data.playing === true) {
-								state.session.state = 'playing'
-								router.push({ name: 'Game' })
-								return
-							}
-
-							// state = joined when opponent joins
-							if (data.opponentJoined === true) state.session.state = 'joined'
+						// ENTER THE GAME
+						if (data.playing === true) {
+							state.session.state = 'playing'
+							router.push({ name: 'Game' })
+							return
 						}
-					} else !getters.playerName(0) && commit('changeName', [0, data.playerOne])
 
-					if (!doc.metadata.hasPendingWrites) {
-						commit('game/updateLocalData', data.gameData)
+						// state = joined when opponent joins
+						if (data.opponentJoined === true) state.session.state = 'joined'
 					}
-				})
+				} else !getters.playerName(0) && commit('changeName', [0, data.playerOne])
+
+				if (!doc.metadata.hasPendingWrites) {
+					commit('game/updateLocalData', data.gameData)
+				}
+			})
 		},
 		enterOnlineGame({ state, getters }) {
-			firestore
-				.collection('sessions')
+			collRef
 				.doc(state.session.id)
 				.update({
 					playerTwo: getters.playerName(1),
@@ -170,13 +173,28 @@ export default createStore({
 				})
 		},
 		updateServerData({ state, getters }) {
-			firestore
-				.collection('sessions')
-				.doc(state.session.id)
-				.update({
-					gameData: { ...state.game },
-					timestamp: Date.now(),
-				})
+			collRef.doc(state.session.id).update({
+				gameData: { ...state.game },
+				timestamp: Date.now(),
+			})
+		},
+		leaveOnlineSession({ state }, redirect = false) {
+			const { id } = state.session
+			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
+			if (redirect) router.push({ name: 'Lobby' })
+
+			return new Promise((resolve, reject) => {
+				if (id) {
+					collRef
+						.doc(id)
+						.delete()
+						.then(() => {
+							resolve()
+						})
+				} else {
+					resolve()
+				}
+			})
 		},
 	},
 	getters: {

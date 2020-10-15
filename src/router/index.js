@@ -31,4 +31,10 @@ const router = createRouter({
 	routes,
 })
 
+// router.beforeEach((to, from, next) => {
+
+// 	if (from.online)
+// 	else next()
+//  })
+
 export default router

@@ -93,6 +93,11 @@ export default {
 			}
 		})
 	},
+	beforeRouteLeave(to, from, next) {
+		console.log('left:', from)
+		if (!this.online) next()
+		else this.$store.dispatch('leaveOnlineSession').then(() => next())
+	},
 }
 </script>
 
