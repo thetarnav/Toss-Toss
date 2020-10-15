@@ -9,14 +9,25 @@
 		>
 			Who are You?
 		</text-input>
-		<gooey-button :disabled="name === ''" @click="submit">
-			<transition name="button-content">
-				<span v-if="!isHost">Play!</span>
-				<span v-else-if="sessionState === 'offline'">copy invite</span>
-				<span v-else-if="sessionState === 'loading'">loading</span>
-				<span v-else>copied</span>
-			</transition>
+		<gooey-button
+			:disabled="name === ''"
+			@click="submit"
+			:loading="sessionState === 'loading'"
+			:message="copyMessage"
+		>
+			<span v-if="!isHost">Play!</span>
+			<span v-else>Copy invite link</span>
 		</gooey-button>
+		<div class="session-state" v-if="isHost">
+			<transition name="session-state" mode="out-in">
+				<span v-if="opponentChoosingName">
+					And now he's choosing a name...
+				</span>
+				<span v-else-if="sessionState === 'joined'">
+					Your opponent has joined.
+				</span>
+			</transition>
+		</div>
 	</div>
 </template>
 
@@ -27,7 +38,7 @@ const goby = require('goby').init()
 export default {
 	name: 'menu-online',
 	data() {
-		return { name: '' }
+		return { name: '', copyMessage: '', opponentChoosingName: false }
 	},
 	computed: { ...mapGetters(['sessionState', 'isHost']) },
 	methods: {
@@ -35,7 +46,11 @@ export default {
 			this.name = goby.generate(['pre', 'suf'])
 		},
 		submit() {
-			if (this.isHost) this.$store.dispatch('startOnlineSession')
+			if (this.isHost)
+				this.$store.dispatch('startOnlineSession').then(() => {
+					this.copyMessage = 'Link copied!'
+					setTimeout(() => (this.copyMessage = ''), 1000)
+				})
 			else this.$store.dispatch('enterOnlineGame')
 		},
 	},
@@ -43,6 +58,12 @@ export default {
 		this.generateName()
 	},
 	watch: {
+		sessionState(now, before) {
+			if (now === 'joined')
+				setTimeout(() => {
+					this.opponentChoosingName = true
+				}, 2500)
+		},
 		name() {
 			this.$store.dispatch('changeName', this.name)
 		},
@@ -66,5 +87,22 @@ export default {
 	.name-input {
 		width: ms(4);
 	}
+}
+
+.session-state {
+	span {
+		display: block;
+	}
+	overflow: hidden;
+}
+
+.session-state-enter-active,
+.session-state-leave-active {
+	transition: transform 0.3s $bouncy-easing;
+}
+
+.session-state-enter-from,
+.session-state-leave-to {
+	transform: translateY(120%) rotate(-5deg);
 }
 </style>

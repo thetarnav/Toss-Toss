@@ -35,7 +35,7 @@ export default createStore({
 			isn't created or wasn't sent to the app
 			*/
 			state: 'offline',
-			inviteLink: undefined,
+			inviteLink: null,
 		},
 	},
 	mutations: {
@@ -60,41 +60,45 @@ export default createStore({
 			router.push({ name: 'Game' })
 		},
 		startOnlineSession({ state, dispatch, getters }) {
-			if (state.session.state !== 'offline') {
-				copyToClipboard(state.session.inviteLink)
-				return
-			}
-			state.online = true
-			state.session.state = 'loading'
-			dispatch('game/initGame')
+			return new Promise((resolve, reject) => {
+				if (state.session.state !== 'offline') {
+					copyToClipboard(state.session.inviteLink)
+					resolve(state.session.inviteLink)
+				}
+				state.online = true
+				state.session.state = 'loading'
+				dispatch('game/initGame')
 
-			firestore
-				.collection('sessions')
-				.add({
-					gameData: { ...state.game },
-					playerOne: getters.playerName(0),
-					playerTwo: null,
-					opponentJoined: false,
-					playing: false,
-					timestamp: Date.now(),
-				})
-				.then(document => {
-					const { id } = document,
-						{ host } = location,
-						inviteLink = `${host}/invite/${id}`
+				firestore
+					.collection('sessions')
+					.add({
+						gameData: { ...state.game },
+						playerOne: getters.playerName(0),
+						playerTwo: null,
+						opponentJoined: false,
+						playing: false,
+						timestamp: Date.now(),
+					})
+					.then(document => {
+						const { id } = document,
+							{ host } = location,
+							inviteLink = `${host}/invite/${id}`
 
-					state.session.id = id
-					state.session.state = 'online'
-					state.session.inviteLink = inviteLink
+						state.session.id = id
+						state.session.state = 'online'
+						state.session.inviteLink = inviteLink
 
-					copyToClipboard(inviteLink)
+						copyToClipboard(inviteLink)
 
-					dispatch('listenServerChanges')
-				})
-				.catch(error => {
-					state.online = false
-					state.session.state = 'offline'
-				})
+						dispatch('listenServerChanges')
+						resolve(inviteLink)
+					})
+					.catch(error => {
+						state.online = false
+						state.session.state = 'offline'
+						reject(error)
+					})
+			})
 		},
 		joinOnlineSession({ state, getters, commit, dispatch }, inviteID) {
 			state.session.host = false
@@ -179,5 +183,6 @@ export default createStore({
 		playerName: state => n => state.playerNames[n],
 		sessionState: state => state.session.state,
 		isHost: state => state.session.host,
+		inviteLink: state => state.session.inviteLink,
 	},
 })
