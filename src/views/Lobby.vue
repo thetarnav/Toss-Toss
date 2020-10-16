@@ -33,20 +33,36 @@
 
 			<menu-online class="online-play" v-else-if="menuState === 'online-play'"></menu-online>
 		</transition>
+
+		<div class="session-state">
+			<transition name="session-state" mode="out-in">
+				<span v-if="isHost && opponentChoosingName && sessionState === 'joined'">
+					And now he's choosing a name...
+				</span>
+				<span v-else-if="isHost && sessionState === 'joined'">
+					Your opponent has joined.
+				</span>
+				<span v-else-if="showPlayerLeft">
+					Player left :(
+				</span>
+			</transition>
+		</div>
 	</div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import menuOnline from '../components/menu-online'
 
 export default {
 	name: 'Lobby',
 	components: { menuOnline },
-	props: ['inviteID'],
+	props: ['inviteID', 'playerLeft'],
 	data() {
-		return {}
+		return { opponentChoosingName: false, showPlayerLeft: false }
 	},
 	computed: {
+		...mapGetters(['sessionState', 'isHost']),
 		menuState() {
 			return this.$route.params.menuState || 'init'
 		},
@@ -56,17 +72,37 @@ export default {
 			this.$router.push({ params: { menuState } })
 		},
 		goBack() {
-			this.$router.go(-1)
+			if (this.$store.state.online)
+				this.$store.dispatch('leaveOnlineSession').then(() => this.$router.go(-1))
+			else this.$router.go(-1)
 		},
 		playHotSeat() {
 			this.$store.dispatch('startHotSeatSession')
+		},
+	},
+	watch: {
+		sessionState(state, before) {
+			if (this.isHost) {
+				if (state === 'joined')
+					setTimeout(() => {
+						this.opponentChoosingName = true
+					}, 2500)
+				else this.opponentChoosingName = false
+			}
+		},
+		playerLeft(state) {
+			if (state) {
+				this.showPlayerLeft = true
+				setTimeout(() => {
+					this.showPlayerLeft = false
+				}, 2500)
+			}
 		},
 	},
 	created() {
 		this.inviteID !== undefined && this.$store.dispatch('joinOnlineSession', this.inviteID)
 	},
 	beforeRouteLeave(to, from, next) {
-		console.log('left:', from)
 		if (!this.$store.state.online || to.name === 'Game') next()
 		else this.$store.dispatch('leaveOnlineSession').then(() => next())
 	},
@@ -120,7 +156,9 @@ export default {
 	right: 0;
 	margin-top: gs(1);
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
 }
 
 .game-select {
@@ -138,5 +176,23 @@ export default {
 .menu-enter-from,
 .menu-leave-to {
 	opacity: 0;
+}
+
+.session-state {
+	margin-top: gs(0.5);
+	span {
+		display: block;
+	}
+	overflow: hidden;
+}
+
+.session-state-enter-active,
+.session-state-leave-active {
+	transition: transform 0.3s $bouncy-easing;
+}
+
+.session-state-enter-from,
+.session-state-leave-to {
+	transform: translateY(120%) rotate(-5deg);
 }
 </style>

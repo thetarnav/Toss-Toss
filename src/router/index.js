@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Lobby from '../views/Lobby.vue'
+import store from '@/store'
 // import Game from '../views/Game.vue'
 
 const routes = [
@@ -21,6 +22,7 @@ const routes = [
 			name: 'Lobby',
 			params: {
 				inviteID: to.params.gameID,
+				menuState: 'online-joined',
 			},
 		}),
 	},
@@ -30,11 +32,5 @@ const router = createRouter({
 	history: createWebHistory(process.env.BASE_URL),
 	routes,
 })
-
-// router.beforeEach((to, from, next) => {
-
-// 	if (from.online)
-// 	else next()
-//  })
 
 export default router

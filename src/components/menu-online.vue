@@ -18,16 +18,6 @@
 			<span v-if="!isHost">Play!</span>
 			<span v-else>Copy invite link</span>
 		</gooey-button>
-		<div class="session-state" v-if="isHost">
-			<transition name="session-state" mode="out-in">
-				<span v-if="opponentChoosingName">
-					And now he's choosing a name...
-				</span>
-				<span v-else-if="sessionState === 'joined'">
-					Your opponent has joined.
-				</span>
-			</transition>
-		</div>
 	</div>
 </template>
 
@@ -38,7 +28,7 @@ const goby = require('goby').init()
 export default {
 	name: 'menu-online',
 	data() {
-		return { name: '', copyMessage: '', opponentChoosingName: false }
+		return { name: '', copyMessage: '' }
 	},
 	computed: { ...mapGetters(['sessionState', 'isHost']) },
 	methods: {
@@ -58,12 +48,6 @@ export default {
 		this.generateName()
 	},
 	watch: {
-		sessionState(now, before) {
-			if (now === 'joined')
-				setTimeout(() => {
-					this.opponentChoosingName = true
-				}, 2500)
-		},
 		name() {
 			this.$store.dispatch('changeName', this.name)
 		},
@@ -87,22 +71,5 @@ export default {
 	.name-input {
 		width: ms(4);
 	}
-}
-
-.session-state {
-	span {
-		display: block;
-	}
-	overflow: hidden;
-}
-
-.session-state-enter-active,
-.session-state-leave-active {
-	transition: transform 0.3s $bouncy-easing;
-}
-
-.session-state-enter-from,
-.session-state-leave-to {
-	transform: translateY(120%) rotate(-5deg);
 }
 </style>

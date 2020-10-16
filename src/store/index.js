@@ -31,6 +31,9 @@ const initialState = {
 			isn't created or wasn't sent to the app
 			*/
 		state: 'offline',
+		/**
+		 * offline -> loading -> joined -> online
+		 */
 		inviteLink: null,
 	},
 }
@@ -129,7 +132,6 @@ export default createStore({
 		},
 		listenServerChanges({ state, commit, getters, dispatch }) {
 			collRef.doc(state.session.id).onSnapshot(doc => {
-				console.log(doc.exists)
 				if (!doc.exists) {
 					if (state.online) dispatch('leaveOnlineSession', true)
 					return
@@ -179,20 +181,28 @@ export default createStore({
 			})
 		},
 		leaveOnlineSession({ state }, redirect = false) {
-			const { id } = state.session
-			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
-			if (redirect) router.push({ name: 'Lobby' })
-
 			return new Promise((resolve, reject) => {
+				if (!state.online) resolve()
+
+				const { id } = state.session
+				Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
+
 				if (id) {
 					collRef
 						.doc(id)
 						.delete()
 						.then(() => {
-							resolve()
+							end()
 						})
-				} else {
-					resolve()
+				} else end()
+
+				function end() {
+					if (redirect) {
+						router.push({ name: 'Lobby', params: { playerLeft: true } })
+						resolve()
+					} else {
+						resolve()
+					}
 				}
 			})
 		},
