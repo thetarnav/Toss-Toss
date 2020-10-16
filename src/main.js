@@ -7,6 +7,8 @@ const app = createApp(App)
 	.use(router)
 	.use(store)
 
+store.state.$app = app
+
 import GooeyButton from './components/ui/gooey-button'
 import TextInput from './components/ui/text-input'
 

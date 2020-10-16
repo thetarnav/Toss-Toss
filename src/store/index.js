@@ -44,6 +44,7 @@ export default createStore({
 	},
 	state: {
 		...cloneDeep(initialState),
+		message: '',
 	},
 	mutations: {
 		resetPlayerNames(state) {
@@ -52,6 +53,9 @@ export default createStore({
 		changeName(state, payload) {
 			const [n, name] = payload
 			state.playerNames[n] = name
+		},
+		clearMessage(state) {
+			state.message = ''
 		},
 	},
 	actions: {
@@ -174,19 +178,25 @@ export default createStore({
 					router.push({ name: 'Game' })
 				})
 		},
-		updateServerData({ state, getters }) {
+		updateServerData({ state }) {
 			collRef.doc(state.session.id).update({
 				gameData: { ...state.game },
 				timestamp: Date.now(),
 			})
 		},
-		leaveOnlineSession({ state }, redirect = false) {
+		leaveOnlineSession({ state, getters }, redirect = false) {
 			return new Promise((resolve, reject) => {
 				if (!state.online) resolve()
 
-				const { id } = state.session
-				Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
+				const { id } = state.session,
+					{ isHost } = getters
 
+				// Reset the root state
+				Object.keys(initialState).forEach(key => {
+					state[key] = initialState[key]
+				})
+
+				// if firestore document is up, delete it
 				if (id) {
 					collRef
 						.doc(id)
@@ -198,7 +208,8 @@ export default createStore({
 
 				function end() {
 					if (redirect) {
-						router.push({ name: 'Lobby', params: { playerLeft: true } })
+						state.message = `${isHost ? 'Opponent' : 'Host'} has disconnected.`
+						router.push({ name: 'Lobby' })
 						resolve()
 					} else {
 						resolve()

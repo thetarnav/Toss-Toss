@@ -42,8 +42,8 @@
 				<span v-else-if="isHost && sessionState === 'joined'">
 					Your opponent has joined.
 				</span>
-				<span v-else-if="showPlayerLeft">
-					Player left :(
+				<span v-else-if="message">
+					{{ message }}
 				</span>
 			</transition>
 		</div>
@@ -51,17 +51,18 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import menuOnline from '../components/menu-online'
 
 export default {
 	name: 'Lobby',
 	components: { menuOnline },
-	props: ['inviteID', 'playerLeft'],
+	props: ['inviteID'],
 	data() {
 		return { opponentChoosingName: false, showPlayerLeft: false }
 	},
 	computed: {
+		...mapState(['message']),
 		...mapGetters(['sessionState', 'isHost']),
 		menuState() {
 			return this.$route.params.menuState || 'init'
@@ -69,6 +70,7 @@ export default {
 	},
 	methods: {
 		setMenuState(menuState) {
+			this.$store.commit('clearMessage')
 			this.$router.push({ params: { menuState } })
 		},
 		goBack() {
@@ -81,21 +83,13 @@ export default {
 		},
 	},
 	watch: {
-		sessionState(state, before) {
+		sessionState(state) {
 			if (this.isHost) {
 				if (state === 'joined')
 					setTimeout(() => {
 						this.opponentChoosingName = true
 					}, 2500)
 				else this.opponentChoosingName = false
-			}
-		},
-		playerLeft(state) {
-			if (state) {
-				this.showPlayerLeft = true
-				setTimeout(() => {
-					this.showPlayerLeft = false
-				}, 2500)
 			}
 		},
 	},
