@@ -85,10 +85,7 @@ export default {
 	watch: {
 		sessionState(state) {
 			if (this.isHost) {
-				if (state === 'joined')
-					setTimeout(() => {
-						this.opponentChoosingName = true
-					}, 2500)
+				if (state === 'joined') setTimeout(() => (this.opponentChoosingName = true), 3500)
 				else this.opponentChoosingName = false
 			}
 		},

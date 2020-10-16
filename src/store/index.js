@@ -17,6 +17,8 @@ const changeNameFirestore = debounce((n, name, sessionID) => {
 	})
 }, 2000)
 
+let _afkInterval
+
 const initialState = {
 	playerNames: [null, null],
 	online: false,
@@ -31,10 +33,10 @@ const initialState = {
 			isn't created or wasn't sent to the app
 			*/
 		state: 'offline',
-		/**
-		 * offline -> loading -> joined -> online
+		/** offline -> loading -> online -> joined -> online
 		 */
 		inviteLink: null,
+		lastActive: null,
 	},
 }
 
@@ -57,6 +59,9 @@ export default createStore({
 		clearMessage(state) {
 			state.message = ''
 		},
+		lastActive(state, timestamp) {
+			state.session.lastActive = timestamp
+		},
 	},
 	actions: {
 		changeName({ state, commit, getters }, name) {
@@ -72,10 +77,23 @@ export default createStore({
 		},
 		startOnlineSession({ state, dispatch, getters }) {
 			return new Promise((resolve, reject) => {
+				/**
+				 * if session is already created
+				 * simply copy existing inviteLink
+				 */
 				if (state.session.state !== 'offline') {
 					copyToClipboard(state.session.inviteLink)
 					resolve(state.session.inviteLink)
 				}
+
+				/**
+				 * init Online Session:
+				 * 1. set session state as 'loading'
+				 * 2. create document in firestore
+				 * 3. if success: set state as 'online' and copy inviteLink
+				 * 3. if not: revert back to 'offline' state
+				 * 4. dispatch listening to server changes
+				 */
 				state.online = true
 				state.session.state = 'loading'
 				dispatch('game/initGame')
@@ -110,7 +128,7 @@ export default createStore({
 					})
 			})
 		},
-		joinOnlineSession({ state, getters, commit, dispatch }, inviteID) {
+		joinOnlineSession({ state, getters, dispatch }, inviteID) {
 			state.session.host = false
 			state.online = true
 
@@ -135,13 +153,24 @@ export default createStore({
 				})
 		},
 		listenServerChanges({ state, commit, getters, dispatch }) {
+			/**
+			 * Watch firestore document updates:
+			 */
 			collRef.doc(state.session.id).onSnapshot(doc => {
+				const data = doc.data(),
+					{ isHost } = getters
+
+				// Document deleted:
 				if (!doc.exists) {
-					if (state.online) dispatch('leaveOnlineSession', true)
+					if (state.online)
+						dispatch('leaveOnlineSession', {
+							redirect: true,
+							message: `${isHost ? 'Opponent' : 'Host'} has disconnected`,
+						})
 					return
 				}
-				const data = doc.data()
-				if (getters.isHost) {
+
+				if (isHost) {
 					!getters.playerName(1) && commit('changeName', [1, data.playerTwo])
 
 					if (getters.sessionState !== 'playing') {
@@ -152,6 +181,7 @@ export default createStore({
 						if (data.playing === true) {
 							state.session.state = 'playing'
 							router.push({ name: 'Game' })
+							dispatch('setAfkInterval')
 							return
 						}
 
@@ -160,12 +190,15 @@ export default createStore({
 					}
 				} else !getters.playerName(0) && commit('changeName', [0, data.playerOne])
 
+				// if the changes came from server (other player)
+				// Update gameData and lastActive timestamp
 				if (!doc.metadata.hasPendingWrites) {
 					commit('game/updateLocalData', data.gameData)
+					commit('lastActive', data.timestamp)
 				}
 			})
 		},
-		enterOnlineGame({ state, getters }) {
+		enterOnlineGame({ state, getters, dispatch }) {
 			collRef
 				.doc(state.session.id)
 				.update({
@@ -176,20 +209,48 @@ export default createStore({
 				.then(() => {
 					state.session.state = 'playing'
 					router.push({ name: 'Game' })
+					dispatch('setAfkInterval')
 				})
 		},
-		updateServerData({ state }) {
+		updateServerData({ state, commit }) {
+			const timestamp = Date.now()
+			/**
+			 * Update local 'lastActive' timestamp
+			 */
+			commit('lastActive', timestamp)
+
+			/**
+			 * Update firebase document:
+			 */
 			collRef.doc(state.session.id).update({
 				gameData: { ...state.game },
-				timestamp: Date.now(),
+				timestamp,
 			})
 		},
-		leaveOnlineSession({ state, getters }, redirect = false) {
-			return new Promise((resolve, reject) => {
+		setAfkInterval({ state, dispatch }) {
+			/**
+			 * Check players inactivity
+			 * every 30 sec
+			 * timeoutLimit: 2 min
+			 */
+			_afkInterval = setInterval(
+				() =>
+					Date.now() - state.session.lastActive > 120000 &&
+					dispatch('leaveOnlineSession', {
+						redirect: true,
+						message: 'Session timeout.',
+					}),
+				30000,
+			)
+		},
+		leaveOnlineSession({ state }, payload = {}) {
+			return new Promise(resolve => {
 				if (!state.online) resolve()
 
-				const { id } = state.session,
-					{ isHost } = getters
+				const { id } = state.session
+
+				// Unset afkInterval
+				typeof _afkInterval === 'number' && clearInterval(_afkInterval)
 
 				// Reset the root state
 				Object.keys(initialState).forEach(key => {
@@ -201,14 +262,12 @@ export default createStore({
 					collRef
 						.doc(id)
 						.delete()
-						.then(() => {
-							end()
-						})
+						.then(() => end())
 				} else end()
 
 				function end() {
-					if (redirect) {
-						state.message = `${isHost ? 'Opponent' : 'Host'} has disconnected.`
+					if (payload.redirect) {
+						state.message = payload.message || ''
 						router.push({ name: 'Lobby' })
 						resolve()
 					} else {
