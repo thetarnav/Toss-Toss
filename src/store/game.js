@@ -1,7 +1,6 @@
 import { random } from '@/js/utilities'
 
 const initialState = {
-	init: false,
 	dices: [],
 	nDices: 6,
 	activePlayer: 0,
@@ -77,7 +76,6 @@ export default {
 		initGame({ state, dispatch, commit, rootState }) {
 			Object.keys(initialState).forEach(key => (state[key] = initialState[key]))
 			state.totalScore = [0, 0]
-			state.init = true
 			commit('resetRound')
 
 			if (rootState.online) {
@@ -86,6 +84,7 @@ export default {
 					if (countPoints(state.dices) > 0) break
 				}
 				Math.random() >= 0.5 && commit('playerSwitch')
+				dispatch('updateServerData', null, { root: true })
 			}
 
 			dispatch('checkRoundOver')

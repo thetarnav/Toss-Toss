@@ -1,6 +1,7 @@
 import { firestore } from '@/firebase'
 import { createStore } from 'vuex'
 import router from '@/router'
+
 import debounce from 'lodash.debounce'
 import cloneDeep from 'lodash.clonedeep'
 import copyToClipboard from 'copy-to-clipboard'
@@ -33,10 +34,11 @@ const initialState = {
 			isn't created or wasn't sent to the app
 			*/
 		state: 'offline',
-		/** offline -> loading -> online -> joined -> online
+		/** offline -> loading -> online -> joined -> playing
 		 */
 		inviteLink: null,
 		lastActive: null,
+		ready: [false, false],
 	},
 }
 
@@ -106,6 +108,7 @@ export default createStore({
 						opponentJoined: false,
 						playing: false,
 						timestamp: Date.now(),
+						ready: [false, false],
 					})
 					.then(document => {
 						const { id } = document,
@@ -158,7 +161,7 @@ export default createStore({
 			 */
 			collRef.doc(state.session.id).onSnapshot(doc => {
 				const data = doc.data(),
-					{ isHost } = getters
+					{ isHost, plyerIndex, opponentIndex } = getters
 
 				// Document deleted:
 				if (!doc.exists) {
@@ -191,10 +194,17 @@ export default createStore({
 				} else !getters.playerName(0) && commit('changeName', [0, data.playerOne])
 
 				// if the changes came from server (other player)
-				// Update gameData and lastActive timestamp
 				if (!doc.metadata.hasPendingWrites) {
+					// Update gameData and lastActive timestamp
 					commit('game/updateLocalData', data.gameData)
 					commit('lastActive', data.timestamp)
+
+					/**
+					 * REMATCH
+					 */
+					if (state.game.winner !== null) {
+						state.session.ready[opponentIndex] = data.ready[opponentIndex]
+					}
 				}
 			})
 		},
@@ -212,7 +222,8 @@ export default createStore({
 					dispatch('setAfkInterval')
 				})
 		},
-		updateServerData({ state, commit }) {
+		updateServerData({ state, commit, getters }) {
+			if (!state.online || getters.sessionState !== 'playing') return
 			const timestamp = Date.now()
 			/**
 			 * Update local 'lastActive' timestamp
@@ -276,11 +287,44 @@ export default createStore({
 				}
 			})
 		},
+		playerReady({ state, dispatch, getters }) {
+			/**
+			 * Opponent is ready, and you accept rematch:
+			 */
+			if (state.session.ready[getters.opponentIndex])
+				// 1. clear server ready data
+				collRef
+					.doc(state.session.id)
+					.update({
+						ready: [false, false],
+					})
+					.then(() => {
+						// 2. init new game -> that will automatically make it start for the opponent
+						dispatch('game/initGame')
+						// 3. clear local ready data
+						state.session.ready = [false, false]
+					})
+			/**
+			 * You are first to ready-up:
+			 */ else {
+				state.session.ready[getters.plyerIndex] = true
+				collRef.doc(state.session.id).update({
+					ready: state.session.ready,
+				})
+			}
+		},
 	},
 	getters: {
 		playerName: state => n => state.playerNames[n],
+		plyerIndex: state => (state.session.host ? 0 : 1),
+		opponentIndex: state => (state.session.host ? 1 : 0),
+		opponentName: state => {
+			const { host } = state.session
+			return state.playerNames[host ? 1 : 0] || (host ? 'PLAYER 2' : 'PLAYER 1')
+		},
 		sessionState: state => state.session.state,
 		isHost: state => state.session.host,
 		inviteLink: state => state.session.inviteLink,
+		ready: state => state.session.ready,
 	},
 })

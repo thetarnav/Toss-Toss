@@ -1,12 +1,5 @@
 <template>
-	<button
-		:ref="
-			el => {
-				parent = el
-			}
-		"
-		class="gooey-button"
-	>
+	<button :ref="el => (parent = el)" class="gooey-button">
 		<div class="slot button-slot" :class="{ hidden: loading }">
 			<slot></slot>
 		</div>
@@ -17,14 +10,7 @@
 		</transition>
 
 		<div class="gooey-background">
-			<span
-				class="mouse-dot"
-				:ref="
-					el => {
-						dot = el
-					}
-				"
-			></span>
+			<span class="mouse-dot" :ref="el => (dot = el)"></span>
 			<div class="message-frame">
 				<transition appear name="t-from-top">
 					<div class="message" v-if="message">

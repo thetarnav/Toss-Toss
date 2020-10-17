@@ -21,19 +21,37 @@
 			<div class="opponent-won" v-else>
 				<h3>
 					<span>
-						Player 2
+						{{ opponentName }}
 					</span>
 				</h3>
 				<h5>won the game!</h5>
 			</div>
+
 			<nav class="buttons">
-				<gooey-button class="quit" @click="quit">
+				<gooey-button @click="quit">
 					Quit
 				</gooey-button>
-				<gooey-button class="re-match" @click="rematch">
+				<gooey-button @click="rematch" v-if="!online">
 					Play Again
 				</gooey-button>
+				<gooey-single-checkbox
+					v-else
+					v-model="playerReady"
+					@check="playerChecksReady"
+					:disabled="playerReady"
+				>
+					Rematch
+				</gooey-single-checkbox>
 			</nav>
+
+			<div class="message">
+				<transition name="message" mode="out-in">
+					<span v-if="opponentReady">
+						{{ opponentName }} {{ winner === 0 ? 'wants revenge!' : 'is ready.' }}
+					</span>
+				</transition>
+			</div>
+
 			<Fireworks v-if="winner === playerIndex" />
 			<div class="cover"></div>
 		</div>
@@ -41,7 +59,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 // import GooeyButton from './GooeyButton'
 import Fireworks from './Fireworks'
 
@@ -49,10 +67,24 @@ export default {
 	name: 'GameResults',
 	components: { Fireworks },
 	props: ['playerIndex'],
+	data() {
+		return {
+			playerReady: false,
+		}
+	},
 	computed: {
 		...mapState('game', ['winner']),
+		...mapState(['online']),
+		...mapGetters(['opponentName', 'ready']),
+		opponentReady() {
+			return this.ready[this.$store.getters.opponentIndex]
+		},
 	},
 	methods: {
+		playerChecksReady(isReady) {
+			if (!isReady) return
+			this.$store.dispatch('playerReady')
+		},
 		rematch() {
 			this.$store.dispatch('game/initGame')
 		},
@@ -120,6 +152,24 @@ h2 {
 	bottom: 0;
 	background: color.$bg;
 	opacity: 0.5;
+}
+
+.message {
+	margin-top: gs(0.5);
+	span {
+		display: block;
+	}
+	overflow: hidden;
+}
+
+.message-enter-active,
+.message-leave-active {
+	transition: transform 0.3s $bouncy-easing;
+}
+
+.message-enter-from,
+.message-leave-to {
+	transform: translateY(120%) rotate(-5deg);
 }
 
 .appear-enter-active,

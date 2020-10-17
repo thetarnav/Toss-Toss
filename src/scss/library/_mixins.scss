@@ -2,6 +2,32 @@
 @use './colors' as color;
 @use './variables' as *;
 
+@mixin full-absolute {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+@mixin absolute-margin($margin) {
+	position: absolute;
+	top: -$margin;
+	left: -$margin;
+	right: initial;
+	bottom: initial;
+	width: calc(100% + #{$margin} * 2);
+	height: calc(100% + #{$margin} * 2);
+}
+
+@mixin absolute-center($width: 0, $height: $width) {
+	position: absolute;
+	width: $width;
+	height: $height;
+	left: calc(50% - #{$width} / 2);
+	top: calc(50% - #{$height} / 2);
+}
+
 @mixin subheading {
 	font-size: font-size(1);
 	// text-transform: uppercase;
@@ -61,6 +87,7 @@
 
 @mixin gooey-background {
 	.gooey-background {
+		pointer-events: none;
 		position: absolute;
 		z-index: -1;
 		top: 0;

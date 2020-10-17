@@ -33,7 +33,7 @@ export default {
 @use '../../scss/library/ms' as *;
 @use '../../scss/library/colors' as color;
 $duration: 0.5s;
-$dot-size: gs(1);
+$dot-size: gs(0.5);
 $main: color.$white;
 
 .preloader-queue {
