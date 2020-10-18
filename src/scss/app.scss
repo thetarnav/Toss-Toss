@@ -15,11 +15,26 @@
 	clear: both;
 }
 
+html {
+	font-size: 20px;
+}
+@media only screen and (max-width: 550px) {
+	html {
+		font-size: 18px;
+	}
+}
+@media only screen and (max-width: $smallest-mq) {
+	html {
+		font-size: 16px;
+	}
+}
+
 body {
 	font-family: 'Nunito', sans-serif;
 	font-weight: 700;
 	position: relative;
 	height: 100vh;
+	overflow: hidden;
 	background: color.$bg;
 	color: color.$dark;
 	display: flex;

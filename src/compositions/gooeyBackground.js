@@ -48,7 +48,7 @@ export default function gooeyBackground() {
 	})
 
 	function handleMove(e) {
-		if (bounds.value === null) return
+		if (bounds.value === null || window.innerWidth < 500) return
 
 		const { x, y } = e,
 			{ left, top } = bounds.value

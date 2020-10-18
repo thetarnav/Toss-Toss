@@ -100,6 +100,10 @@ $padding: 0;
 	align-content: center;
 	width: $size * 3 + $margin * 3;
 	min-height: $size * 2 + $margin * 2;
+
+	@media screen and (max-width: $smallest-mq) {
+		width: $size * 2 + $margin * 2;
+	}
 }
 .dice {
 	position: relative;

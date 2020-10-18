@@ -172,4 +172,10 @@ export default {
 		}
 	}
 }
+
+@media screen and (max-width: $smallest-mq) {
+	.game-results {
+		width: 100%;
+	}
+}
 </style>

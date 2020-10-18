@@ -166,7 +166,6 @@ h2 {
 .message-leave-active {
 	transition: transform 0.3s $bouncy-easing;
 }
-
 .message-enter-from,
 .message-leave-to {
 	transform: translateY(120%) rotate(-5deg);
@@ -176,7 +175,6 @@ h2 {
 .appear-leave-active {
 	transition: opacity 0.5s ease;
 }
-
 .appear-enter-from,
 .appear-leave-to {
 	opacity: 0;
