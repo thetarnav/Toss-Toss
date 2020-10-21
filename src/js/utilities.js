@@ -140,14 +140,14 @@ export const getUrlValue = key => {
 	if (url === '') return false
 
 	if (url.search(/=/) == -1 && url == key) return true
-	
-		let val
-		url.split('&').forEach(exp => {
-			const pair = exp.split('=')
-			if (pair[0] == key) val = pair[1]
-		})
-		return decodeURIComponent(val)
-	
+
+	let val
+	url.split('&').forEach(exp => {
+		const pair = exp.split('=')
+		if (pair[0] == key) val = pair[1]
+	})
+	return decodeURIComponent(val)
+
 	return false
 }
 
@@ -158,7 +158,7 @@ export function setUrlVar(key = null, value = null, dictionary = null) {
 	if (key !== null) dict[key] = value
 
 	for (const k in dict)
-		string += dict[k] !== null ? `${k  }=${  encodeURIComponent(dict[k])  }&` : `${k  }&`
+		string += dict[k] !== null ? `${k}=${encodeURIComponent(dict[k])}&` : `${k}&`
 
 	history.replaceState(null, null, location.pathname + string.slice(0, -1))
 }
@@ -181,6 +181,53 @@ export const URL = {
 	del: delUrlVal,
 }
 
+export function isSuperset(set, subset) {
+	for (const elem of subset) {
+		if (!set.has(elem)) {
+			return false
+		}
+	}
+	return true
+}
+
+export function union(setA, setB) {
+	const _union = new Set(setA)
+	for (const elem of setB) {
+		_union.add(elem)
+	}
+	return _union
+}
+
+export function intersection(setA, setB) {
+	const _intersection = new Set()
+	for (const elem of setB) {
+		if (setA.has(elem)) {
+			_intersection.add(elem)
+		}
+	}
+	return _intersection
+}
+
+export function symmetricDifference(setA, setB) {
+	const _difference = new Set(setA)
+	for (const elem of setB) {
+		if (_difference.has(elem)) {
+			_difference.delete(elem)
+		} else {
+			_difference.add(elem)
+		}
+	}
+	return _difference
+}
+
+export function difference(setA, setB) {
+	const _difference = new Set(setA)
+	for (const elem of setB) {
+		_difference.delete(elem)
+	}
+	return _difference
+}
+
 export function addMultiEventListener(el, s, fn) {
 	s.split(' ').forEach(e => el.addEventListener(e, fn, false))
 }
@@ -193,7 +240,7 @@ export function addMultiEventListener(el, s, fn) {
  * @param  {Node}   form The form to serialize
  * @return {String}      The serialized form data
  */
-export var serialize = function(form) {
+export function serialize(form) {
 	// Setup our serialized data
 	const serialized = []
 
@@ -217,12 +264,12 @@ export var serialize = function(form) {
 			for (let n = 0; n < field.options.length; n++) {
 				if (!field.options[n].selected) continue
 				serialized.push(
-					`${encodeURIComponent(field.name)  }=${  encodeURIComponent(field.options[n].value)}`,
+					`${encodeURIComponent(field.name)}=${encodeURIComponent(field.options[n].value)}`,
 				)
 			}
 		} else if ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked) {
 			// Convert field data to a query string
-			serialized.push(`${encodeURIComponent(field.name)  }=${  encodeURIComponent(field.value)}`)
+			serialized.push(`${encodeURIComponent(field.name)}=${encodeURIComponent(field.value)}`)
 		}
 	}
 
